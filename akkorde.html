@@ -1175,10 +1175,9 @@ Ugly things that I think daily
       }
 
       function calculateEffectiveTranspose(song) {
-        return (
-          (song.transposeKey || 0) +
-          ((song.originalCapo || 0) - (song.capo || 0))
-        );
+        // Der Kapo beeinflusst die angezeigte Tonart-Zahl nicht mehr.
+        // Es wird nur noch der manuelle transposeKey angezeigt.
+        return song.transposeKey || 0;
       }
 
       function capoLabel(song) {
