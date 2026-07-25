@@ -1,0 +1,1658 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Songbook</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0d1117;
+        --surface: #161b22;
+        --surface-2: #21262d;
+        --surface-3: #30363d;
+        --border: #30363d;
+        --wood: #f39c12;
+        --wood-hover: #f1c40f;
+        --string: #2ecc71;
+        --text: #f0f6fc;
+        --text-dim: #8b949e;
+        --text-faint: #484f58;
+        --danger: #f85149;
+        --danger-dim: #490202;
+        --radius: 12px;
+        --radius-sm: 8px;
+        --font-display: "Outfit", system-ui, sans-serif;
+        --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
+        --font-mono: "Fira Code", monospace;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--font-body);
+        max-width: 920px;
+        margin: auto;
+        padding: 28px 20px 80px;
+        background: var(--bg);
+        background-image: radial-gradient(
+          circle at 20% 0%,
+          rgba(243, 156, 18, 0.08),
+          transparent 50%
+        );
+        color: var(--text);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Guitar Strings Divider */
+      .strings {
+        width: 100%;
+        height: 32px;
+        margin: 18px 0 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .strings span {
+        display: block;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          #30363d 15%,
+          #30363d 85%,
+          transparent
+        );
+        opacity: 0.7;
+        border-radius: 2px;
+      }
+      .strings span:nth-child(1) {
+        height: 3px;
+      }
+      .strings span:nth-child(2) {
+        height: 2.4px;
+      }
+      .strings span:nth-child(3) {
+        height: 2px;
+      }
+      .strings span:nth-child(4) {
+        height: 1.6px;
+      }
+      .strings span:nth-child(5) {
+        height: 1.2px;
+      }
+      .strings span:nth-child(6) {
+        height: 0.8px;
+      }
+
+      header h1 {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 42px;
+        letter-spacing: -0.5px;
+        margin: 0;
+      }
+      header .tagline {
+        color: var(--text-dim);
+        font-size: 15px;
+        margin-top: 4px;
+      }
+
+      h2 {
+        font-family: var(--font-display);
+        font-weight: 700;
+      }
+      h3 {
+        font-family: var(--font-display);
+        font-weight: 700;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        margin-top: 0;
+        margin-bottom: 12px;
+      }
+
+      textarea,
+      input[type="text"],
+      input[type="search"],
+      select {
+        background: var(--surface-2);
+        color: var(--text);
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-family: var(--font-body);
+        font-size: 14px;
+        transition: all 0.2s ease;
+      }
+      textarea:focus,
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--wood);
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
+      }
+      textarea {
+        width: 100%;
+        height: 180px;
+        font-family: var(--font-mono);
+        resize: vertical;
+        line-height: 1.5;
+      }
+
+      /* Stepper Controls */
+      .number-control {
+        display: inline-flex;
+        align-items: center;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+      }
+      .number-control:focus-within {
+        border-color: var(--wood);
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
+      }
+      .number-control button {
+        background: transparent;
+        border: none;
+        color: var(--text-dim);
+        padding: 6px 12px;
+        font-size: 15px;
+        cursor: pointer;
+      }
+      .number-control button:hover {
+        background: var(--surface-3);
+        color: var(--text);
+      }
+      .number-control input[type="number"] {
+        width: 44px;
+        text-align: center;
+        border: none;
+        background: transparent;
+        color: var(--text);
+        font-family: var(--font-mono);
+        font-weight: 700;
+        padding: 6px 0;
+        appearance: textfield;
+      }
+      .number-control input[type="number"]::-webkit-inner-spin-button,
+      .number-control input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      button {
+        background: var(--surface-2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 8px 14px;
+        cursor: pointer;
+        font-family: var(--font-body);
+        font-size: 13.5px;
+        font-weight: 600;
+        transition: all 0.15s ease;
+      }
+      button:hover {
+        background: var(--surface-3);
+        border-color: var(--wood);
+      }
+      button:active {
+        transform: scale(0.98);
+      }
+
+      .btn-primary {
+        background: var(--wood);
+        color: #0d1117;
+        border-color: var(--wood);
+      }
+      .btn-primary:hover {
+        background: var(--wood-hover);
+        border-color: var(--wood-hover);
+      }
+
+      .btn-danger {
+        background: var(--danger-dim);
+        border-color: rgba(248, 81, 73, 0.3);
+        color: #ffb4b0;
+      }
+      .btn-danger:hover {
+        background: #671010;
+        border-color: var(--danger);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        border-color: transparent;
+        color: var(--text-dim);
+      }
+      .btn-ghost:hover {
+        background: var(--surface-2);
+        color: var(--text);
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      .toolbar {
+        position: sticky;
+        top: 14px;
+        background: rgba(22, 27, 34, 0.9);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 10px 16px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 100;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow);
+      }
+      .toolbar .label {
+        font-size: 13px;
+        color: var(--text-dim);
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .toolbar input[type="range"] {
+        accent-color: var(--wood);
+        cursor: pointer;
+      }
+      .toolbar small {
+        color: var(--text-faint);
+        margin-left: auto;
+      }
+
+      .progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: var(--wood);
+        z-index: 200;
+        width: 0%;
+      }
+
+      /* Folders UI */
+      .folder-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+      .folder-chip {
+        --folder-color: var(--wood);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.15s ease;
+      }
+      .folder-chip:hover {
+        border-color: var(--folder-color);
+        color: var(--text);
+      }
+      .folder-chip.active {
+        background: var(--folder-color);
+        color: #0d1117;
+        border-color: var(--folder-color);
+      }
+      .folder-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--folder-color);
+        display: inline-block;
+      }
+      .folder-chip.active .folder-dot {
+        background: #0d1117;
+      }
+      .folder-chip .count {
+        opacity: 0.75;
+        font-size: 12px;
+      }
+      .folder-chip .chip-btn {
+        opacity: 0.6;
+        font-size: 12px;
+        margin-left: 2px;
+      }
+      .folder-chip .chip-btn:hover {
+        opacity: 1;
+      }
+
+      .folder-chip-add {
+        background: transparent;
+        border: 1px dashed var(--border);
+        color: var(--text-faint);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .folder-chip-add:hover {
+        border-color: var(--wood);
+        color: var(--text);
+      }
+
+      .folder-info-text {
+        margin-top: 10px;
+        font-size: 13px;
+        color: var(--text-dim);
+        font-style: italic;
+      }
+
+      .folder-badge,
+      .bpm-badge {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 999px;
+      }
+      .bpm-badge {
+        color: var(--wood);
+        background: rgba(243, 156, 18, 0.12);
+        border: 1px solid rgba(243, 156, 18, 0.25);
+      }
+
+      .capo-info {
+        font-size: 12.5px;
+        color: var(--text-dim);
+        background: rgba(243, 156, 18, 0.08);
+        border: 1px solid var(--border);
+        padding: 4px 10px;
+        border-radius: var(--radius-sm);
+        font-weight: 500;
+      }
+
+      /* TOC List */
+      #toc {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 6px;
+      }
+      #toc li {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 10px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #toc li:hover {
+        border-color: var(--wood);
+      }
+      #toc a {
+        color: var(--wood);
+        text-decoration: none;
+        font-weight: 600;
+        font-family: var(--font-display);
+      }
+      #toc a:hover {
+        text-decoration: underline;
+      }
+      #toc .toc-artist {
+        color: var(--text-faint);
+        font-size: 13px;
+        font-style: italic;
+      }
+
+      /* Song Card */
+      .song {
+        background: var(--surface);
+        padding: 26px;
+        margin-top: 20px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        scroll-margin-top: 80px;
+        box-shadow: var(--shadow);
+      }
+      .song h2 {
+        margin: 0 0 4px;
+        font-size: 28px;
+        letter-spacing: -0.3px;
+      }
+      .artist {
+        font-size: 15px;
+        color: var(--text-dim);
+        font-style: italic;
+      }
+
+      .chord {
+        font-weight: 700;
+        color: var(--wood);
+        font-family: var(--font-mono);
+      }
+      .section {
+        font-family: var(--font-display);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-top: 18px;
+        font-weight: 700;
+        color: var(--string);
+        display: block;
+      }
+
+      .song-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        background: var(--surface-2);
+        padding: 10px 14px;
+        border-radius: var(--radius-sm);
+        margin: 16px 0 20px;
+        border: 1px solid var(--border);
+      }
+      .song-actions label {
+        color: var(--text-dim);
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .song-actions .status {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        color: var(--wood);
+        font-size: 13px;
+        background: rgba(243, 156, 18, 0.12);
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+      .song-actions .spacer {
+        margin-left: auto;
+      }
+
+      pre {
+        font-family: var(--font-mono);
+        white-space: pre-wrap;
+        font-size: var(--lyric-size, 16px);
+        line-height: 1.65;
+        margin: 0;
+      }
+
+      .controls-toggle {
+        width: 100%;
+        text-align: left;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 18px;
+        font-family: var(--font-display);
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--shadow);
+      }
+      .controls-toggle:hover {
+        border-color: var(--wood);
+      }
+      .controls-panel {
+        margin-top: 10px;
+        display: none;
+      }
+      .controls-panel.open {
+        display: block;
+      }
+
+      .capo-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 12px 0;
+        flex-wrap: wrap;
+      }
+      .capo-row label {
+        color: var(--text-dim);
+        font-size: 13.5px;
+      }
+
+      .edit-panel {
+        display: grid;
+        gap: 12px;
+      }
+      .edit-panel .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .edit-panel textarea {
+        height: 220px;
+      }
+
+      /* Modal Dialog */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: var(--shadow);
+      }
+      .modal h3 {
+        font-size: 18px;
+        margin-bottom: 16px;
+        color: var(--text);
+      }
+      .color-picker {
+        display: flex;
+        gap: 8px;
+        margin: 10px 0 16px;
+        flex-wrap: wrap;
+      }
+      .color-option {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.15s ease;
+      }
+      .color-option:hover {
+        transform: scale(1.15);
+      }
+      .color-option.selected {
+        border-color: #ffffff;
+        transform: scale(1.15);
+      }
+
+      footer {
+        text-align: center;
+        color: var(--text-faint);
+        font-size: 12.5px;
+        margin-top: 50px;
+      }
+
+      @media (max-width: 640px) {
+        header h1 {
+          font-size: 32px;
+        }
+        .edit-panel .row2 {
+          grid-template-columns: 1fr;
+        }
+        .toolbar small {
+          display: none;
+        }
+      }
+
+      @media print {
+        .toolbar,
+        .controls-toggle,
+        .controls-panel,
+        .toc-wrap,
+        .song-actions,
+        footer,
+        .progress-bar,
+        .strings,
+        .card {
+          display: none !important;
+        }
+        body {
+          background: white;
+          color: black;
+          padding: 0;
+        }
+        .song {
+          border: none;
+          page-break-inside: avoid;
+          background: white;
+          box-shadow: none;
+        }
+        .chord {
+          color: #333;
+        }
+        .section {
+          color: #555;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="progress-bar" id="scrollProgress"></div>
+
+    <header>
+      <h1>Songbook</h1>
+      <div class="tagline">
+        Deine Akkorde. Transponiert, kapo-berechnet, immer griffbereit.
+      </div>
+    </header>
+
+    <div class="strings">
+      <span></span><span></span><span></span><span></span><span></span
+      ><span></span>
+    </div>
+
+    <div class="toolbar">
+      <select
+        id="quickJumpSelect"
+        onchange="jumpToSong(this.value)"
+        style="max-width: 220px"
+      >
+        <option value="">Song wählen...</option>
+      </select>
+
+      <button id="scrollToggle" onclick="toggleScroll()">▶ Start</button>
+      <label for="speed" class="label"
+        >Tempo <span id="speedVal">3</span></label
+      >
+      <input
+        type="range"
+        id="speed"
+        min="1"
+        max="15"
+        value="3"
+        oninput="document.getElementById('speedVal').innerText = this.value"
+      />
+
+      <label for="fontSize" class="label">Text</label>
+      <input
+        type="range"
+        id="fontSize"
+        min="12"
+        max="26"
+        value="16"
+        oninput="setFontSize(this.value)"
+      />
+
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="🔍 Song suchen…"
+        oninput="renderSongs()"
+      />
+      <small>Leertaste = Play/Pause</small>
+    </div>
+
+    <div class="card" style="margin-bottom: 18px">
+      <h3>Ordner</h3>
+      <div class="folder-bar" id="folderBar"></div>
+      <div class="folder-info-text" id="folderInfoText"></div>
+    </div>
+
+    <div class="toc-wrap card">
+      <h3>Inhaltsverzeichnis</h3>
+      <div
+        style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap"
+      >
+        <button class="btn-ghost" onclick="exportSongs()">Exportieren</button>
+        <button
+          class="btn-ghost"
+          onclick="document.getElementById('importFile').click()"
+        >
+          Importieren
+        </button>
+        <input
+          type="file"
+          id="importFile"
+          accept="application/json"
+          style="display: none"
+          onchange="importSongs(this.files[0])"
+        />
+      </div>
+      <ul id="toc"></ul>
+    </div>
+
+    <button class="controls-toggle" onclick="toggleAddPanel()">
+      <span>➕ Neuen Song hinzufügen</span>
+      <span id="addPanelArrow">▾</span>
+    </button>
+
+    <div class="controls-panel card" id="addPanel">
+      <div style="display: flex; gap: 10px; margin-bottom: 10px">
+        <input id="title" type="text" placeholder="Songtitel" style="flex: 1" />
+        <input
+          id="artist"
+          type="text"
+          placeholder="Künstler / Interpret"
+          style="flex: 1"
+        />
+      </div>
+      <textarea id="input" placeholder="Text mit Akkorden hier eingeben...">
+Bm                 D
+Love you, hate me, you're my family
+
+G                  D
+Ugly things that I think daily
+      </textarea>
+      <div class="capo-row">
+        <label>🎸 Original-Kapo Bund:</label>
+        <div class="number-control">
+          <button type="button" onclick="stepNumber('capo', -1)">−</button>
+          <input id="capo" type="number" value="0" min="0" max="12" />
+          <button type="button" onclick="stepNumber('capo', 1)">+</button>
+        </div>
+
+        <label style="margin-left: 15px">🥁 Tempo (BPM):</label>
+        <div class="number-control">
+          <button type="button" onclick="stepNumber('bpm', -5)">−</button>
+          <input
+            id="bpm"
+            type="number"
+            value="120"
+            min="30"
+            max="300"
+            style="width: 54px"
+          />
+          <button type="button" onclick="stepNumber('bpm', 5)">+</button>
+        </div>
+      </div>
+      <div class="capo-row">
+        <label>📁 Ordner:</label>
+        <select
+          id="songFolder"
+          onchange="handleFolderSelectChange(this)"
+        ></select>
+        <button class="btn-primary" onclick="addSong()">Song hinzufügen</button>
+      </div>
+    </div>
+
+    <div id="songs"></div>
+
+    <div class="modal-overlay" id="folderModal">
+      <div class="modal">
+        <h3 id="folderModalTitle">Ordner bearbeiten</h3>
+        <input type="hidden" id="folderOldName" />
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <label style="font-size: 13px; color: var(--text-dim)">Name:</label>
+          <input type="text" id="folderNameInput" placeholder="Ordnername" />
+
+          <label
+            style="font-size: 13px; color: var(--text-dim); margin-top: 4px"
+            >Beschreibung (optional):</label
+          >
+          <input
+            type="text"
+            id="folderDescInput"
+            placeholder="z. B. Für Akustik-Gigs"
+          />
+
+          <label
+            style="font-size: 13px; color: var(--text-dim); margin-top: 4px"
+            >Farbe wählen:</label
+          >
+          <div class="color-picker" id="colorPicker"></div>
+        </div>
+        <div
+          style="
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 18px;
+          "
+        >
+          <button class="btn-ghost" onclick="closeFolderModal()">
+            Abbrechen
+          </button>
+          <button class="btn-primary" onclick="saveFolderModal()">
+            Speichern
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Songs werden automatisch lokal in diesem Browser gespeichert.
+    </footer>
+
+    <script>
+      const STORAGE_KEY = "guitarSongbook";
+      const FOLDERS_KEY = "guitarSongbookFoldersData";
+      const NEW_FOLDER_VALUE = "__new__";
+
+      const FOLDER_COLORS = [
+        "#f39c12",
+        "#2ecc71",
+        "#e74c3c",
+        "#3498db",
+        "#9b59b6",
+        "#1abc9c",
+        "#e67e22",
+        "#f1c40f",
+      ];
+
+      let songs = loadSongs();
+      let folders = loadFolders();
+      let currentFolderFilter = "__all__";
+      let selectedFolderColor = FOLDER_COLORS[0];
+      let scrollRAF = null;
+      let isScrolling = false;
+      let lastFrameTime = null;
+      let scrollAccumulator = 0;
+
+      function stepNumber(id, amount) {
+        const input = document.getElementById(id);
+        if (!input) return;
+        let val = parseInt(input.value) || 0;
+        const min = input.min !== "" ? parseInt(input.min) : -Infinity;
+        const max = input.max !== "" ? parseInt(input.max) : Infinity;
+        input.value = Math.min(max, Math.max(min, val + amount));
+        input.dispatchEvent(new Event("change"));
+      }
+
+      function loadSongs() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveSongs() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(songs));
+        } catch (e) {}
+      }
+
+      function loadFolders() {
+        try {
+          return JSON.parse(localStorage.getItem(FOLDERS_KEY)) || [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveFolders() {
+        try {
+          localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
+        } catch (e) {}
+      }
+
+      function getFolder(name) {
+        return folders.find(
+          (f) => f.name.toLowerCase() === (name || "").toLowerCase(),
+        );
+      }
+
+      function openFolderModal(folderName = "") {
+        const modal = document.getElementById("folderModal");
+        const title = document.getElementById("folderModalTitle");
+        const nameInput = document.getElementById("folderNameInput");
+        const descInput = document.getElementById("folderDescInput");
+        document.getElementById("folderOldName").value = folderName;
+        const existing = getFolder(folderName);
+
+        if (existing) {
+          title.textContent = "Ordner bearbeiten";
+          nameInput.value = existing.name;
+          descInput.value = existing.description || "";
+          selectedFolderColor = existing.color || FOLDER_COLORS[0];
+        } else {
+          title.textContent = "Neuer Ordner";
+          nameInput.value = folderName;
+          descInput.value = "";
+          selectedFolderColor =
+            FOLDER_COLORS[folders.length % FOLDER_COLORS.length];
+        }
+
+        renderColorPicker();
+        modal.classList.add("open");
+        nameInput.focus();
+      }
+
+      function closeFolderModal() {
+        document.getElementById("folderModal").classList.remove("open");
+      }
+
+      function renderColorPicker() {
+        const picker = document.getElementById("colorPicker");
+        picker.innerHTML = "";
+        FOLDER_COLORS.forEach((c) => {
+          const opt = document.createElement("div");
+          opt.className =
+            "color-option" + (c === selectedFolderColor ? " selected" : "");
+          opt.style.backgroundColor = c;
+          opt.onclick = () => {
+            selectedFolderColor = c;
+            renderColorPicker();
+          };
+          picker.appendChild(opt);
+        });
+      }
+
+      function saveFolderModal() {
+        const oldName = document.getElementById("folderOldName").value;
+        const newName = document.getElementById("folderNameInput").value.trim();
+        const desc = document.getElementById("folderDescInput").value.trim();
+        if (!newName) return;
+
+        const existingIdx = folders.findIndex(
+          (f) => f.name.toLowerCase() === oldName.toLowerCase(),
+        );
+        if (existingIdx >= 0) {
+          folders[existingIdx] = {
+            name: newName,
+            description: desc,
+            color: selectedFolderColor,
+          };
+          if (oldName !== newName) {
+            songs.forEach((s) => {
+              if (s.folder === oldName) s.folder = newName;
+            });
+            if (currentFolderFilter === oldName) currentFolderFilter = newName;
+          }
+        } else {
+          folders.push({
+            name: newName,
+            description: desc,
+            color: selectedFolderColor,
+          });
+          currentFolderFilter = newName;
+        }
+
+        saveFolders();
+        saveSongs();
+        closeFolderModal();
+        renderSongs();
+      }
+
+      function deleteFolder(name) {
+        if (!confirm(`Ordner "${name}" löschen? Songs darin bleiben erhalten.`))
+          return;
+        folders = folders.filter((f) => f.name !== name);
+        songs.forEach((s) => {
+          if (s.folder === name) s.folder = "";
+        });
+        if (currentFolderFilter === name) currentFolderFilter = "__all__";
+        saveFolders();
+        saveSongs();
+        renderSongs();
+      }
+
+      function selectFolderFilter(name) {
+        currentFolderFilter = name;
+        renderSongs();
+      }
+
+      function populateFolderSelect(selectEl, selectedValue) {
+        if (!selectEl) return;
+        selectEl.innerHTML = "";
+        const noneOpt = document.createElement("option");
+        noneOpt.value = "";
+        noneOpt.textContent = "Ohne Ordner";
+        selectEl.appendChild(noneOpt);
+
+        folders.forEach((f) => {
+          const opt = document.createElement("option");
+          opt.value = f.name;
+          opt.textContent = f.name;
+          selectEl.appendChild(opt);
+        });
+
+        const newOpt = document.createElement("option");
+        newOpt.value = NEW_FOLDER_VALUE;
+        newOpt.textContent = "+ Neuer Ordner…";
+        selectEl.appendChild(newOpt);
+
+        selectEl.value = selectedValue || "";
+      }
+
+      function handleFolderSelectChange(selectEl) {
+        if (selectEl.value === NEW_FOLDER_VALUE) openFolderModal();
+      }
+
+      const scaleSharp = [
+        "C",
+        "C#",
+        "D",
+        "D#",
+        "E",
+        "F",
+        "F#",
+        "G",
+        "G#",
+        "A",
+        "A#",
+        "B",
+      ];
+      const scaleFlat = [
+        "C",
+        "Db",
+        "D",
+        "Eb",
+        "E",
+        "F",
+        "Gb",
+        "G",
+        "Ab",
+        "A",
+        "Bb",
+        "B",
+      ];
+      const noteToMap = {
+        C: 0,
+        "C#": 1,
+        Db: 1,
+        D: 2,
+        "D#": 3,
+        Eb: 3,
+        E: 4,
+        F: 5,
+        "F#": 6,
+        Gb: 6,
+        G: 7,
+        "G#": 8,
+        Ab: 8,
+        A: 9,
+        "A#": 10,
+        Bb: 10,
+        B: 11,
+      };
+      const CHORD_TOKEN_RE =
+        /^[A-G][#b]?(?:maj|min|dim|sus|add|aug|m)?[0-9]*(?:\/[A-G][#b]?)?$/;
+
+      function transposeNote(root, amount) {
+        if (!(root in noteToMap)) return root;
+        const idx = (noteToMap[root] + amount + 120) % 12;
+        return root.includes("b") ? scaleFlat[idx] : scaleSharp[idx];
+      }
+
+      function changeChord(chord, amount) {
+        if (amount === 0) return chord;
+        return chord
+          .split("/")
+          .map((part) => {
+            const match = part.match(/^([A-G][#b]?)(.*)$/);
+            return match ? transposeNote(match[1], amount) + match[2] : part;
+          })
+          .join("/");
+      }
+
+      function isChordLine(line) {
+        return (
+          line !== "" && line.split(/\s+/).every((t) => CHORD_TOKEN_RE.test(t))
+        );
+      }
+
+      function processText(text, { transpose = 0, highlight = false } = {}) {
+        return text
+          .split("\n")
+          .map((line) => {
+            const trimmed = line.trim();
+            if (/^\[.*\]$/.test(trimmed)) {
+              return highlight
+                ? `<span class="section">${escapeHtml(trimmed)}</span>`
+                : trimmed;
+            }
+            if (isChordLine(trimmed)) {
+              return line
+                .split(/(\s+)/)
+                .map((part) => {
+                  if (/^\s*$/.test(part)) return part;
+                  const transposed = changeChord(part, transpose);
+                  return highlight
+                    ? `<span class="chord">${escapeHtml(transposed)}</span>`
+                    : transposed;
+                })
+                .join("");
+            }
+            return highlight ? escapeHtml(line) : line;
+          })
+          .join("\n");
+      }
+
+      function escapeHtml(str) {
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function jumpToSong(index) {
+        if (index === "") return;
+        const el = document.getElementById("song-" + index);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+          const song = songs[index];
+          if (song && song.bpm) {
+            const mappedSpeed = Math.min(
+              15,
+              Math.max(1, Math.round(song.bpm / 15)),
+            );
+            document.getElementById("speed").value = mappedSpeed;
+            document.getElementById("speedVal").innerText = mappedSpeed;
+          }
+        }
+        document.getElementById("quickJumpSelect").value = "";
+      }
+
+      function updateQuickJumpSelect() {
+        const sel = document.getElementById("quickJumpSelect");
+        if (!sel) return;
+        sel.innerHTML = '<option value="">⏮️ Song wählen...</option>';
+        songs.forEach((s, i) => {
+          const opt = document.createElement("option");
+          opt.value = i;
+          opt.textContent = s.artist ? `${s.title} — ${s.artist}` : s.title;
+          sel.appendChild(opt);
+        });
+      }
+
+      function calculateEffectiveTranspose(song) {
+        return (
+          (song.transposeKey || 0) +
+          ((song.originalCapo || 0) - (song.capo || 0))
+        );
+      }
+
+      function capoLabel(song) {
+        const fret = song.capo || 0;
+        const orig = song.originalCapo || 0;
+        let text = fret <= 0 ? "Ohne Kapo" : `Kapo Bund ${fret}`;
+        if (fret !== orig) {
+          text += ` <span style="opacity:0.7; font-size:11px;">(Orig: ${orig})</span>`;
+        }
+        return text;
+      }
+
+      function renderFolderBar() {
+        const bar = document.getElementById("folderBar");
+        const infoText = document.getElementById("folderInfoText");
+        bar.innerHTML = "";
+        infoText.textContent = "";
+
+        const allChip = document.createElement("button");
+        allChip.className =
+          "folder-chip" + (currentFolderFilter === "__all__" ? " active" : "");
+        allChip.innerHTML = `Alle <span class="count">${songs.length}</span>`;
+        allChip.onclick = () => selectFolderFilter("__all__");
+        bar.appendChild(allChip);
+
+        const unassignedCount = songs.filter((s) => !s.folder).length;
+        if (unassignedCount > 0) {
+          const noneChip = document.createElement("button");
+          noneChip.className =
+            "folder-chip" +
+            (currentFolderFilter === "__none__" ? " active" : "");
+          noneChip.innerHTML = `📄 Ohne Ordner <span class="count">${unassignedCount}</span>`;
+          noneChip.onclick = () => selectFolderFilter("__none__");
+          bar.appendChild(noneChip);
+        }
+
+        folders.forEach((f) => {
+          const count = songs.filter((s) => s.folder === f.name).length;
+          const chip = document.createElement("button");
+          chip.className =
+            "folder-chip" + (currentFolderFilter === f.name ? " active" : "");
+          chip.style.setProperty("--folder-color", f.color || "var(--wood)");
+          chip.innerHTML = `
+            <span class="folder-dot"></span>
+            ${escapeHtml(f.name)}
+            <span class="count">${count}</span>
+            <span class="chip-btn edit-btn" title="Ordner bearbeiten">✏️</span>
+            <span class="chip-btn del-btn" title="Ordner löschen">✕</span>
+          `;
+
+          chip.querySelector(".edit-btn").onclick = (e) => {
+            e.stopPropagation();
+            openFolderModal(f.name);
+          };
+          chip.querySelector(".del-btn").onclick = (e) => {
+            e.stopPropagation();
+            deleteFolder(f.name);
+          };
+          chip.addEventListener("click", (e) => {
+            if (!e.target.classList.contains("chip-btn"))
+              selectFolderFilter(f.name);
+          });
+          bar.appendChild(chip);
+        });
+
+        const addChip = document.createElement("button");
+        addChip.className = "folder-chip-add";
+        addChip.textContent = "+ Neuer Ordner";
+        addChip.onclick = () => openFolderModal();
+        bar.appendChild(addChip);
+
+        if (
+          currentFolderFilter !== "__all__" &&
+          currentFolderFilter !== "__none__"
+        ) {
+          const activeFolder = getFolder(currentFolderFilter);
+          if (activeFolder && activeFolder.description) {
+            infoText.textContent = `ℹ️ ${activeFolder.description}`;
+          }
+        }
+      }
+
+      function renderSongs() {
+        const container = document.getElementById("songs");
+        const toc = document.getElementById("toc");
+        const query = (document.getElementById("searchInput").value || "")
+          .trim()
+          .toLowerCase();
+
+        container.innerHTML = "";
+        toc.innerHTML = "";
+        renderFolderBar();
+        updateQuickJumpSelect();
+
+        const matches = (song) => {
+          if (
+            query &&
+            !(
+              song.title.toLowerCase().includes(query) ||
+              (song.artist || "").toLowerCase().includes(query)
+            )
+          )
+            return false;
+          if (currentFolderFilter === "__all__") return true;
+          if (currentFolderFilter === "__none__") return !song.folder;
+          return song.folder === currentFolderFilter;
+        };
+
+        let visibleCount = 0;
+        songs.forEach((song, i) => {
+          if (!matches(song)) return;
+          visibleCount++;
+
+          const div = document.createElement("div");
+          div.className = "song";
+          div.id = "song-" + i;
+          div.innerHTML = getSongHTML(song, i);
+          container.appendChild(div);
+
+          if (song.editing) {
+            const sel = document.getElementById(`edit-folder-${i}`);
+            if (sel) populateFolderSelect(sel, song.folder || "");
+          }
+
+          const li = document.createElement("li");
+          const artistStr = song.artist
+            ? `<span class="toc-artist">${escapeHtml(song.artist)}</span>`
+            : "<span></span>";
+          li.innerHTML = `<a href="#song-${i}">${escapeHtml(song.title)}</a>${artistStr}`;
+          toc.appendChild(li);
+        });
+
+        if (visibleCount === 0) {
+          const li = document.createElement("li");
+          li.style.color = "var(--text-faint)";
+          li.textContent = query
+            ? "Keine Treffer."
+            : "Noch keine Songs in diesem Ordner.";
+          toc.appendChild(li);
+        }
+      }
+
+      function getSongHTML(song, index) {
+        if (song.editing) return getEditHTML(song, index);
+
+        const totalTranspose = calculateEffectiveTranspose(song);
+        const transLabel =
+          totalTranspose > 0 ? `+${totalTranspose}` : `${totalTranspose}`;
+        const displayedHTML = processText(song.originalText, {
+          transpose: totalTranspose,
+          highlight: true,
+        });
+
+        const folderObj = getFolder(song.folder);
+        const folderColor = folderObj ? folderObj.color : "var(--string)";
+
+        return `
+        <h2>${escapeHtml(song.title)}</h2>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom: 12px;">
+            ${song.artist ? `<div class="artist">von ${escapeHtml(song.artist)}</div>` : ""}
+            ${song.folder ? `<span class="folder-badge" style="color:${folderColor}; background:${folderColor}18; border-color:${folderColor}40;">📁 ${escapeHtml(song.folder)}</span>` : ""}
+            ${song.bpm ? `<span class="bpm-badge">🥁 ${song.bpm} BPM</span>` : ""}
+        </div>
+
+        <div class="song-actions">
+            <label>Tonart (+/−)</label>
+            <button onclick="transposeSong(${index}, -1)">−1</button>
+            <span class="status">${transLabel}</span>
+            <button onclick="transposeSong(${index}, 1)">+1</button>
+
+            <label style="margin-left:8px;">🎸 Kapo:</label>
+            <div class="number-control">
+              <button onclick="stepCapo(${index}, -1)">−</button>
+              <input type="number" value="${song.capo || 0}" min="0" max="12" onchange="changeCapo(${index}, this.value)">
+              <button onclick="stepCapo(${index}, 1)">+</button>
+            </div>
+            <span class="capo-info">${capoLabel(song)}</span>
+
+            <div class="spacer"></div>
+            <button onclick="editSong(${index})">✏️ Bearbeiten</button>
+        </div>
+
+        <pre id="pre-${index}">${displayedHTML}</pre>
+    `;
+      }
+
+      function getEditHTML(song, index) {
+        return `
+        <div class="edit-panel">
+            <div class="row2">
+                <input type="text" id="edit-title-${index}" value="${escapeHtml(song.title)}" placeholder="Songtitel">
+                <input type="text" id="edit-artist-${index}" value="${escapeHtml(song.artist || "")}" placeholder="Künstler / Interpret">
+            </div>
+            <textarea id="edit-text-${index}">${escapeHtml(song.originalText)}</textarea>
+            <div class="capo-row">
+                <label>🎸 Original Kapo Bund:</label>
+                <div class="number-control">
+                  <button type="button" onclick="stepNumber('edit-capo-${index}', -1)">−</button>
+                  <input type="number" id="edit-capo-${index}" value="${song.originalCapo !== undefined ? song.originalCapo : song.capo || 0}" min="0" max="12">
+                  <button type="button" onclick="stepNumber('edit-capo-${index}', 1)">+</button>
+                </div>
+                <label style="margin-left:15px;">🥁 BPM:</label>
+                <div class="number-control">
+                  <button type="button" onclick="stepNumber('edit-bpm-${index}', -5)">−</button>
+                  <input type="number" id="edit-bpm-${index}" value="${song.bpm || 120}" min="30" max="300" style="width:54px;">
+                  <button type="button" onclick="stepNumber('edit-bpm-${index}', 5)">+</button>
+                </div>
+            </div>
+            <div class="capo-row">
+                <label>📁 Ordner:</label>
+                <select id="edit-folder-${index}" onchange="handleFolderSelectChange(this)"></select>
+            </div>
+            <div class="edit-actions" style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+                <button class="btn-danger" onclick="deleteSong(${index})">🗑️ Löschen</button>
+                <button onclick="cancelEdit(${index})">Abbrechen</button>
+                <div style="margin-left:auto;"></div>
+                <button class="btn-primary" onclick="saveEdit(${index})">💾 Speichern</button>
+            </div>
+        </div>
+    `;
+      }
+
+      function updateSongDOM(index) {
+        const songDiv = document.getElementById(`song-${index}`);
+        if (!songDiv) return;
+        songDiv.innerHTML = getSongHTML(songs[index], index);
+        if (songs[index].editing) {
+          const sel = document.getElementById(`edit-folder-${index}`);
+          if (sel) populateFolderSelect(sel, songs[index].folder || "");
+        }
+      }
+
+      function addSong() {
+        const title =
+          document.getElementById("title").value.trim() || "Unbekannter Song";
+        const artist = document.getElementById("artist").value.trim();
+        const text = document.getElementById("input").value;
+        let capo = Math.min(
+          12,
+          Math.max(0, parseInt(document.getElementById("capo").value) || 0),
+        );
+        const bpm = parseInt(document.getElementById("bpm").value) || 120;
+        let folder = document.getElementById("songFolder").value;
+
+        if (folder === NEW_FOLDER_VALUE) folder = "";
+
+        songs.push({
+          title,
+          artist,
+          originalText: text,
+          capo,
+          originalCapo: capo,
+          bpm,
+          transposeKey: 0,
+          folder,
+        });
+        saveSongs();
+        renderSongs();
+
+        document.getElementById("title").value = "";
+        document.getElementById("artist").value = "";
+        document.getElementById("input").value = "";
+        document.getElementById("capo").value = "0";
+      }
+
+      function deleteSong(index) {
+        if (confirm(`Möchtest du "${songs[index].title}" wirklich löschen?`)) {
+          songs.splice(index, 1);
+          saveSongs();
+          renderSongs();
+        }
+      }
+
+      function transposeSong(index, amount) {
+        songs[index].transposeKey = (songs[index].transposeKey || 0) + amount;
+        saveSongs();
+        updateSongDOM(index);
+      }
+
+      function stepCapo(index, amount) {
+        changeCapo(index, (songs[index].capo || 0) + amount);
+      }
+
+      function changeCapo(index, newCapoVal) {
+        let capo = parseInt(newCapoVal);
+        if (isNaN(capo)) capo = 0;
+        songs[index].capo = Math.min(12, Math.max(0, capo));
+        saveSongs();
+        updateSongDOM(index);
+      }
+
+      function editSong(index) {
+        songs[index].editing = true;
+        updateSongDOM(index);
+        document.getElementById(`edit-title-${index}`).focus();
+      }
+
+      function cancelEdit(index) {
+        songs[index].editing = false;
+        updateSongDOM(index);
+      }
+
+      function saveEdit(index) {
+        const title =
+          document.getElementById(`edit-title-${index}`).value.trim() ||
+          "Unbekannter Song";
+        const artist = document
+          .getElementById(`edit-artist-${index}`)
+          .value.trim();
+        const text = document.getElementById(`edit-text-${index}`).value;
+        let capo = Math.min(
+          12,
+          Math.max(
+            0,
+            parseInt(document.getElementById(`edit-capo-${index}`).value) || 0,
+          ),
+        );
+        const bpm =
+          parseInt(document.getElementById(`edit-bpm-${index}`).value) || 120;
+        const folderSel = document.getElementById(`edit-folder-${index}`);
+        let folder = folderSel ? folderSel.value : songs[index].folder;
+
+        if (folder === NEW_FOLDER_VALUE) folder = "";
+
+        // Falls sich das Original-Kapo geändert hat, passen wir den aktuellen Kapo-Wert an, sofern er noch auf dem alten Original stand
+        const oldOrig =
+          songs[index].originalCapo !== undefined
+            ? songs[index].originalCapo
+            : songs[index].capo;
+        if (songs[index].capo === oldOrig) {
+          songs[index].capo = capo;
+        }
+
+        songs[index] = {
+          ...songs[index],
+          title,
+          artist,
+          originalText: text,
+          capo,
+          originalCapo: capo,
+          bpm,
+          folder,
+          editing: false,
+        };
+        saveSongs();
+        renderSongs();
+      }
+
+      function exportSongs() {
+        const blob = new Blob([JSON.stringify({ songs, folders }, null, 2)], {
+          type: "application/json",
+        });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "songbook-backup.json";
+        a.click();
+      }
+
+      function importSongs(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const imported = JSON.parse(e.target.result);
+            if (Array.isArray(imported)) {
+              songs = songs.concat(
+                imported.filter((s) => s && s.title && s.originalText),
+              );
+            } else if (imported.songs) {
+              songs = songs.concat(imported.songs);
+              if (imported.folders) {
+                imported.folders.forEach((f) => {
+                  if (!getFolder(f.name)) folders.push(f);
+                });
+                saveFolders();
+              }
+            }
+            saveSongs();
+            renderSongs();
+          } catch (err) {
+            alert("Import fehlgeschlagen: " + err.message);
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      function toggleAddPanel() {
+        const panel = document.getElementById("addPanel");
+        const arrow = document.getElementById("addPanelArrow");
+        panel.classList.toggle("open");
+        arrow.textContent = panel.classList.contains("open") ? "▴" : "▾";
+      }
+
+      function setFontSize(px) {
+        document.documentElement.style.setProperty("--lyric-size", px + "px");
+      }
+
+      function toggleScroll() {
+        const button = document.getElementById("scrollToggle");
+        if (isScrolling) {
+          isScrolling = false;
+          if (scrollRAF) cancelAnimationFrame(scrollRAF);
+          button.innerText = "▶ Start";
+        } else {
+          isScrolling = true;
+          button.innerText = "⏸ Stopp";
+          lastFrameTime = performance.now();
+          scrollAccumulator = 0;
+          scrollRAF = requestAnimationFrame(scrollStep);
+        }
+      }
+
+      function scrollStep(now) {
+        if (!isScrolling) return;
+        const dt = (now - (lastFrameTime || now)) / 1000;
+        lastFrameTime = now;
+        const speedSetting = parseInt(
+          document.getElementById("speed").value,
+          10,
+        );
+        scrollAccumulator += speedSetting * 8 * dt;
+
+        if (scrollAccumulator >= 1) {
+          const movePixels = Math.floor(scrollAccumulator);
+          window.scrollBy(0, movePixels);
+          scrollAccumulator -= movePixels;
+        }
+
+        if (
+          window.innerHeight + window.scrollY >=
+          document.body.scrollHeight - 2
+        ) {
+          toggleScroll();
+          return;
+        }
+        scrollRAF = requestAnimationFrame(scrollStep);
+      }
+
+      function updateProgressBar() {
+        const doc = document.documentElement;
+        const scrollable = doc.scrollHeight - doc.clientHeight;
+        const pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+        document.getElementById("scrollProgress").style.width = pct + "%";
+      }
+      window.addEventListener("scroll", updateProgressBar);
+
+      window.addEventListener("keydown", (e) => {
+        if (
+          ["INPUT", "TEXTAREA", "SELECT"].includes(
+            document.activeElement.tagName,
+          )
+        )
+          return;
+        const speedInput = document.getElementById("speed");
+        const currentSpeed = parseInt(speedInput.value, 10);
+
+        if (e.code === "Space") {
+          e.preventDefault();
+          toggleScroll();
+        } else if ((e.key === "+" || e.key === "Add") && currentSpeed < 15) {
+          speedInput.value = currentSpeed + 1;
+          document.getElementById("speedVal").innerText = speedInput.value;
+        } else if (
+          (e.key === "-" || e.key === "Subtract") &&
+          currentSpeed > 1
+        ) {
+          speedInput.value = currentSpeed - 1;
+          document.getElementById("speedVal").innerText = speedInput.value;
+        }
+      });
+
+      populateFolderSelect(document.getElementById("songFolder"), "");
+      renderSongs();
+      updateProgressBar();
+    </script>
+  </body>
+</html>
