@@ -12,13 +12,16 @@
     />
     <style>
       :root {
-        --bg: #0d1117;
-        --surface: #161b22;
-        --surface-2: #21262d;
-        --surface-3: #30363d;
-        --border: #30363d;
+        --bg: #121212;
+        --surface: #1e1e1e;
+        --surface-2: #252525;
+        --surface-3: #2d2d2d;
+        --border: #333333;
+
         --wood: #f39c12;
         --wood-hover: #f1c40f;
+        --wood-glow: rgba(243, 156, 18, 0.15);
+
         --string: #2ecc71;
         --text: #f0f6fc;
         --text-dim: #8b949e;
@@ -41,23 +44,77 @@
         font-family: var(--font-body);
         max-width: 920px;
         margin: auto;
-        padding: 28px 20px 80px;
+        padding: 20px 20px 80px;
         background: var(--bg);
-        background-image: radial-gradient(
-          circle at 20% 0%,
-          rgba(243, 156, 18, 0.08),
-          transparent 50%
-        );
         color: var(--text);
         line-height: 1.5;
         -webkit-font-smoothing: antialiased;
       }
 
-      /* Guitar Strings Divider */
+      .top-outer-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .accent-picker {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .accent-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.15s ease;
+      }
+      .accent-dot:hover {
+        transform: scale(1.2);
+      }
+      .accent-dot.active {
+        border-color: #ffffff;
+        transform: scale(1.2);
+      }
+
+      /* Plus-Button exakt zentriert im Quadrat */
+      .outer-add-btn {
+        background: var(--surface-2);
+        color: var(--wood);
+        border: 1px solid var(--border);
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .outer-add-btn:hover {
+        background: var(--surface-3);
+        border-color: var(--wood);
+      }
+      .outer-add-btn-glyph {
+        display: block;
+        width: 18px;
+        height: 18px;
+        transition: transform 0.2s ease;
+      }
+      .outer-add-btn.open .outer-add-btn-glyph {
+        transform: rotate(45deg);
+      }
+
       .strings {
         width: 100%;
         height: 32px;
-        margin: 18px 0 30px;
+        margin: 10px 0 24px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -67,8 +124,8 @@
         background: linear-gradient(
           90deg,
           transparent,
-          #30363d 15%,
-          #30363d 85%,
+          #333333 15%,
+          #333333 85%,
           transparent
         );
         opacity: 0.7;
@@ -99,6 +156,11 @@
         font-size: 42px;
         letter-spacing: -0.5px;
         margin: 0;
+        cursor: pointer;
+        display: inline-block;
+      }
+      header h1:hover {
+        color: var(--wood);
       }
       header .tagline {
         color: var(--text-dim);
@@ -139,7 +201,7 @@
       select:focus {
         outline: none;
         border-color: var(--wood);
-        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
+        box-shadow: 0 0 0 3px var(--wood-glow);
       }
       textarea {
         width: 100%;
@@ -149,7 +211,6 @@
         line-height: 1.5;
       }
 
-      /* Stepper Controls */
       .number-control {
         display: inline-flex;
         align-items: center;
@@ -160,7 +221,7 @@
       }
       .number-control:focus-within {
         border-color: var(--wood);
-        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
+        box-shadow: 0 0 0 3px var(--wood-glow);
       }
       .number-control button {
         background: transparent;
@@ -213,7 +274,7 @@
 
       .btn-primary {
         background: var(--wood);
-        color: #0d1117;
+        color: #121212;
         border-color: var(--wood);
       }
       .btn-primary:hover {
@@ -252,7 +313,7 @@
       .toolbar {
         position: sticky;
         top: 14px;
-        background: rgba(22, 27, 34, 0.9);
+        background: rgba(30, 30, 30, 0.92);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         padding: 10px 16px;
@@ -281,17 +342,14 @@
         margin-left: auto;
       }
 
-      .progress-bar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 3px;
-        background: var(--wood);
-        z-index: 200;
-        width: 0%;
+      .toolbar-search {
+        flex: 1;
+        min-width: 180px;
+        padding: 6px 12px;
+        font-size: 13.5px;
+        margin-left: auto;
       }
 
-      /* Folders UI */
       .folder-bar {
         display: flex;
         flex-wrap: wrap;
@@ -319,7 +377,7 @@
       }
       .folder-chip.active {
         background: var(--folder-color);
-        color: #0d1117;
+        color: #121212;
         border-color: var(--folder-color);
       }
       .folder-dot {
@@ -330,7 +388,7 @@
         display: inline-block;
       }
       .folder-chip.active .folder-dot {
-        background: #0d1117;
+        background: #121212;
       }
       .folder-chip .count {
         opacity: 0.75;
@@ -375,21 +433,20 @@
       }
       .bpm-badge {
         color: var(--wood);
-        background: rgba(243, 156, 18, 0.12);
+        background: var(--wood-glow);
         border: 1px solid rgba(243, 156, 18, 0.25);
       }
 
       .capo-info {
         font-size: 12.5px;
         color: var(--text-dim);
-        background: rgba(243, 156, 18, 0.08);
+        background: var(--wood-glow);
         border: 1px solid var(--border);
         padding: 4px 10px;
         border-radius: var(--radius-sm);
         font-weight: 500;
       }
 
-      /* TOC List */
       #toc {
         list-style: none;
         padding: 0;
@@ -414,17 +471,22 @@
         text-decoration: none;
         font-weight: 600;
         font-family: var(--font-display);
+        cursor: pointer;
       }
       #toc a:hover {
         text-decoration: underline;
       }
       #toc .toc-artist {
-        color: var(--text-faint);
+        color: var(--text-dim);
         font-size: 13px;
         font-style: italic;
+        cursor: pointer;
+      }
+      #toc .toc-artist:hover {
+        color: var(--wood);
+        text-decoration: underline;
       }
 
-      /* Song Card */
       .song {
         background: var(--surface);
         padding: 26px;
@@ -438,11 +500,22 @@
         margin: 0 0 4px;
         font-size: 28px;
         letter-spacing: -0.3px;
+        cursor: pointer;
+        display: inline-block;
+      }
+      .song h2:hover {
+        color: var(--wood);
       }
       .artist {
         font-size: 15px;
         color: var(--text-dim);
         font-style: italic;
+        cursor: pointer;
+        display: inline-block;
+      }
+      .artist:hover {
+        color: var(--wood);
+        text-decoration: underline;
       }
 
       .chord {
@@ -450,15 +523,26 @@
         color: var(--wood);
         font-family: var(--font-mono);
       }
+
+      .tablature {
+        font-weight: 600;
+        color: var(--wood);
+        font-family: var(--font-mono);
+      }
+
       .section {
         font-family: var(--font-display);
         font-size: 12px;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
-        margin-top: 18px;
+        letter-spacing: 0.12em;
+        margin-top: 22px;
+        margin-bottom: 6px;
         font-weight: 700;
-        color: var(--string);
+        color: var(--wood);
         display: block;
+        opacity: 0.9;
+        border-left: 2px solid var(--wood);
+        padding-left: 8px;
       }
 
       .song-actions {
@@ -482,7 +566,7 @@
         font-weight: 700;
         color: var(--wood);
         font-size: 13px;
-        background: rgba(243, 156, 18, 0.12);
+        background: var(--wood-glow);
         padding: 4px 8px;
         border-radius: 4px;
       }
@@ -498,27 +582,10 @@
         margin: 0;
       }
 
-      .controls-toggle {
-        width: 100%;
-        text-align: left;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 14px 18px;
-        font-family: var(--font-display);
-        font-size: 18px;
-        font-weight: 600;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: var(--shadow);
-      }
-      .controls-toggle:hover {
-        border-color: var(--wood);
-      }
       .controls-panel {
-        margin-top: 10px;
+        margin-top: 14px;
         display: none;
+        margin-bottom: 24px;
       }
       .controls-panel.open {
         display: block;
@@ -549,7 +616,6 @@
         height: 220px;
       }
 
-      /* Modal Dialog */
       .modal-overlay {
         position: fixed;
         top: 0;
@@ -623,12 +689,11 @@
 
       @media print {
         .toolbar,
-        .controls-toggle,
+        .top-outer-bar,
         .controls-panel,
         .toc-wrap,
         .song-actions,
         footer,
-        .progress-bar,
         .strings,
         .card {
           display: none !important;
@@ -644,24 +709,49 @@
           background: white;
           box-shadow: none;
         }
-        .chord {
+        .chord,
+        .tablature {
           color: #333;
         }
         .section {
-          color: #555;
+          background: transparent !important;
+          border-left: 2px solid #333 !important;
+          color: #333 !important;
         }
       }
     </style>
   </head>
 
   <body>
-    <div class="progress-bar" id="scrollProgress"></div>
+    <div class="top-outer-bar">
+      <div
+        class="accent-picker"
+        id="accentPicker"
+        title="Akzentfarbe wählen"
+      ></div>
+      <button
+        class="outer-add-btn"
+        id="addSongToggleBtn"
+        onclick="toggleAddPanel()"
+        title="Neuen Song hinzufügen"
+      >
+        <svg
+          class="outer-add-btn-glyph"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+        >
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+    </div>
 
     <header>
-      <h1>Songbook</h1>
-      <div class="tagline">
-        Deine Akkorde. Transponiert, kapo-berechnet, immer griffbereit.
-      </div>
+      <h1 onclick="exitSongFocus()">Songbook</h1>
+      <div class="tagline"></div>
     </header>
 
     <div class="strings">
@@ -670,15 +760,7 @@
     </div>
 
     <div class="toolbar">
-      <select
-        id="quickJumpSelect"
-        onchange="jumpToSong(this.value)"
-        style="max-width: 220px"
-      >
-        <option value="">Song wählen...</option>
-      </select>
-
-      <button id="scrollToggle" onclick="toggleScroll()">▶ Start</button>
+      <button id="scrollToggle" onclick="toggleScroll()">Start</button>
       <label for="speed" class="label"
         >Tempo <span id="speedVal">3</span></label
       >
@@ -704,19 +786,75 @@
       <input
         type="search"
         id="searchInput"
-        placeholder="🔍 Song suchen…"
+        class="toolbar-search"
+        list="songSuggestions"
+        placeholder="Song suchen..."
         oninput="renderSongs()"
       />
-      <small>Leertaste = Play/Pause</small>
+      <datalist id="songSuggestions"></datalist>
     </div>
 
-    <div class="card" style="margin-bottom: 18px">
+    <div class="controls-panel card" id="addPanel">
+      <h3>Neuen Song hinzufügen</h3>
+      <div style="display: flex; gap: 10px; margin-bottom: 10px">
+        <input id="title" type="text" placeholder="Songtitel" style="flex: 1" />
+        <input
+          id="artist"
+          type="text"
+          placeholder="Künstler / Interpret"
+          style="flex: 1"
+          list="artistSuggestions"
+        />
+        <datalist id="artistSuggestions"></datalist>
+      </div>
+      <textarea id="input" placeholder="Text mit Akkorden hier eingeben...">
+[Verse 1]
+Bm                 D
+Love you, hate me, you're my family
+
+[Chorus]
+G                  D
+Ugly things that I think daily
+      </textarea>
+      <div class="capo-row">
+        <label>Original-Kapo Bund:</label>
+        <div class="number-control">
+          <button type="button" onclick="stepNumber('capo', -1)">-</button>
+          <input id="capo" type="number" value="0" min="0" max="12" />
+          <button type="button" onclick="stepNumber('capo', 1)">+</button>
+        </div>
+
+        <label style="margin-left: 15px">Tempo (BPM):</label>
+        <div class="number-control">
+          <button type="button" onclick="stepNumber('bpm', -5)">-</button>
+          <input
+            id="bpm"
+            type="number"
+            value="120"
+            min="30"
+            max="300"
+            style="width: 54px"
+          />
+          <button type="button" onclick="stepNumber('bpm', 5)">+</button>
+        </div>
+      </div>
+      <div class="capo-row">
+        <label>Ordner:</label>
+        <select
+          id="songFolder"
+          onchange="handleFolderSelectChange(this)"
+        ></select>
+        <button class="btn-primary" onclick="addSong()">Hinzufügen</button>
+      </div>
+    </div>
+
+    <div class="card" id="folderCardContainer" style="margin-bottom: 18px">
       <h3>Ordner</h3>
       <div class="folder-bar" id="folderBar"></div>
       <div class="folder-info-text" id="folderInfoText"></div>
     </div>
 
-    <div class="toc-wrap card">
+    <div class="toc-wrap card" id="tocWrapper">
       <h3>Inhaltsverzeichnis</h3>
       <div
         style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap"
@@ -737,60 +875,6 @@
         />
       </div>
       <ul id="toc"></ul>
-    </div>
-
-    <button class="controls-toggle" onclick="toggleAddPanel()">
-      <span>➕ Neuen Song hinzufügen</span>
-      <span id="addPanelArrow">▾</span>
-    </button>
-
-    <div class="controls-panel card" id="addPanel">
-      <div style="display: flex; gap: 10px; margin-bottom: 10px">
-        <input id="title" type="text" placeholder="Songtitel" style="flex: 1" />
-        <input
-          id="artist"
-          type="text"
-          placeholder="Künstler / Interpret"
-          style="flex: 1"
-        />
-      </div>
-      <textarea id="input" placeholder="Text mit Akkorden hier eingeben...">
-Bm                 D
-Love you, hate me, you're my family
-
-G                  D
-Ugly things that I think daily
-      </textarea>
-      <div class="capo-row">
-        <label>🎸 Original-Kapo Bund:</label>
-        <div class="number-control">
-          <button type="button" onclick="stepNumber('capo', -1)">−</button>
-          <input id="capo" type="number" value="0" min="0" max="12" />
-          <button type="button" onclick="stepNumber('capo', 1)">+</button>
-        </div>
-
-        <label style="margin-left: 15px">🥁 Tempo (BPM):</label>
-        <div class="number-control">
-          <button type="button" onclick="stepNumber('bpm', -5)">−</button>
-          <input
-            id="bpm"
-            type="number"
-            value="120"
-            min="30"
-            max="300"
-            style="width: 54px"
-          />
-          <button type="button" onclick="stepNumber('bpm', 5)">+</button>
-        </div>
-      </div>
-      <div class="capo-row">
-        <label>📁 Ordner:</label>
-        <select
-          id="songFolder"
-          onchange="handleFolderSelectChange(this)"
-        ></select>
-        <button class="btn-primary" onclick="addSong()">Song hinzufügen</button>
-      </div>
     </div>
 
     <div id="songs"></div>
@@ -837,34 +921,101 @@ Ugly things that I think daily
       </div>
     </div>
 
-    <footer>
-      Songs werden automatisch lokal in diesem Browser gespeichert.
-    </footer>
+    <footer></footer>
 
     <script>
       const STORAGE_KEY = "guitarSongbook";
       const FOLDERS_KEY = "guitarSongbookFoldersData";
+      const ACCENT_KEY = "guitarSongbookAccent";
       const NEW_FOLDER_VALUE = "__new__";
 
-      const FOLDER_COLORS = [
-        "#f39c12",
-        "#2ecc71",
-        "#e74c3c",
-        "#3498db",
-        "#9b59b6",
-        "#1abc9c",
-        "#e67e22",
-        "#f1c40f",
+      const ACCENT_PRESETS = [
+        {
+          name: "Holz/Orange",
+          main: "#f39c12",
+          hover: "#f1c40f",
+          glow: "rgba(243, 156, 18, 0.15)",
+        },
+        {
+          name: "Grün",
+          main: "#2ecc71",
+          hover: "#27ae60",
+          glow: "rgba(46, 204, 113, 0.15)",
+        },
+        {
+          name: "Rot",
+          main: "#e74c3c",
+          hover: "#c0392b",
+          glow: "rgba(231, 76, 60, 0.15)",
+        },
+        {
+          name: "Blau",
+          main: "#3498db",
+          hover: "#2980b9",
+          glow: "rgba(52, 152, 219, 0.15)",
+        },
+        {
+          name: "Violett",
+          main: "#9b59b6",
+          hover: "#8e44ad",
+          glow: "rgba(155, 89, 182, 0.15)",
+        },
+        {
+          name: "Türkis",
+          main: "#1abc9c",
+          hover: "#16a085",
+          glow: "rgba(26, 188, 156, 0.15)",
+        },
       ];
+
+      const FOLDER_COLORS = ACCENT_PRESETS.map((p) => p.main);
 
       let songs = loadSongs();
       let folders = loadFolders();
       let currentFolderFilter = "__all__";
+      let activeSongIndex = null;
       let selectedFolderColor = FOLDER_COLORS[0];
       let scrollRAF = null;
       let isScrolling = false;
       let lastFrameTime = null;
       let scrollAccumulator = 0;
+
+      function initAccentColor() {
+        const savedMain =
+          localStorage.getItem(ACCENT_KEY) || ACCENT_PRESETS[0].main;
+        const preset =
+          ACCENT_PRESETS.find((p) => p.main === savedMain) || ACCENT_PRESETS[0];
+        setAccentColor(preset, false);
+        renderAccentPicker(preset.main);
+      }
+
+      function setAccentColor(preset, save = true) {
+        document.documentElement.style.setProperty("--wood", preset.main);
+        document.documentElement.style.setProperty(
+          "--wood-hover",
+          preset.hover,
+        );
+        document.documentElement.style.setProperty("--wood-glow", preset.glow);
+        if (save) {
+          localStorage.setItem(ACCENT_KEY, preset.main);
+          renderAccentPicker(preset.main);
+        }
+      }
+
+      function renderAccentPicker(activeMain) {
+        const picker = document.getElementById("accentPicker");
+        if (!picker) return;
+        picker.innerHTML = "";
+        ACCENT_PRESETS.forEach((preset) => {
+          const dot = document.createElement("div");
+          dot.className =
+            "accent-dot" + (preset.main === activeMain ? " active" : "");
+          dot.style.backgroundColor = preset.main;
+          dot.title = preset.name;
+          dot.onclick = () => setAccentColor(preset);
+          picker.appendChild(dot);
+        });
+      }
 
       function stepNumber(id, amount) {
         const input = document.getElementById(id);
@@ -893,9 +1044,7 @@ Ugly things that I think daily
       function loadFolders() {
         try {
           return JSON.parse(localStorage.getItem(FOLDERS_KEY)) || [];
-        } catch (e) {
-          return [];
-        }
+        } catch (e) {}
       }
 
       function saveFolders() {
@@ -1027,7 +1176,7 @@ Ugly things that I think daily
 
         const newOpt = document.createElement("option");
         newOpt.value = NEW_FOLDER_VALUE;
-        newOpt.textContent = "+ Neuer Ordner…";
+        newOpt.textContent = "+ Neuer Ordner...";
         selectEl.appendChild(newOpt);
 
         selectEl.value = selectedValue || "";
@@ -1086,6 +1235,7 @@ Ugly things that I think daily
       };
       const CHORD_TOKEN_RE =
         /^[A-G][#b]?(?:maj|min|dim|sus|add|aug|m)?[0-9]*(?:\/[A-G][#b]?)?$/;
+      const REPEAT_TOKEN_RE = /^[xX]\d+$/;
 
       function transposeNote(root, amount) {
         if (!(root in noteToMap)) return root;
@@ -1105,9 +1255,19 @@ Ugly things that I think daily
       }
 
       function isChordLine(line) {
-        return (
-          line !== "" && line.split(/\s+/).every((t) => CHORD_TOKEN_RE.test(t))
-        );
+        if (line === "") return false;
+        return line
+          .split(/\s+/)
+          .every((t) => CHORD_TOKEN_RE.test(t) || REPEAT_TOKEN_RE.test(t));
+      }
+
+      const TAB_LINE_RE =
+        /^[a-gA-G]\s*\|[-0-9hHpPbBsS\/\\~()xX.\s]*\|?\s*(?:[xX]\d+)?\s*$/;
+      const TAB_LINE_GENERIC_RE = /^[\|\-][-0-9hHpPbBsS\/\\~()xX.\s\|]*$/;
+
+      function isTabLine(line) {
+        if (line === "") return false;
+        return TAB_LINE_RE.test(line) || TAB_LINE_GENERIC_RE.test(line);
       }
 
       function processText(text, { transpose = 0, highlight = false } = {}) {
@@ -1132,6 +1292,11 @@ Ugly things that I think daily
                 })
                 .join("");
             }
+            if (isTabLine(trimmed)) {
+              return highlight
+                ? `<span class="tablature">${escapeHtml(line)}</span>`
+                : line;
+            }
             return highlight ? escapeHtml(line) : line;
           })
           .join("\n");
@@ -1144,40 +1309,30 @@ Ugly things that I think daily
           .replace(/>/g, "&gt;");
       }
 
-      function jumpToSong(index) {
-        if (index === "") return;
-        const el = document.getElementById("song-" + index);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth" });
-          const song = songs[index];
-          if (song && song.bpm) {
-            const mappedSpeed = Math.min(
-              15,
-              Math.max(1, Math.round(song.bpm / 15)),
-            );
-            document.getElementById("speed").value = mappedSpeed;
-            document.getElementById("speedVal").innerText = mappedSpeed;
-          }
-        }
-        document.getElementById("quickJumpSelect").value = "";
+      function focusSong(index) {
+        activeSongIndex = index;
+        renderSongs();
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
-      function updateQuickJumpSelect() {
-        const sel = document.getElementById("quickJumpSelect");
-        if (!sel) return;
-        sel.innerHTML = '<option value="">⏮️ Song wählen...</option>';
-        songs.forEach((s, i) => {
-          const opt = document.createElement("option");
-          opt.value = i;
-          opt.textContent = s.artist ? `${s.title} — ${s.artist}` : s.title;
-          sel.appendChild(opt);
-        });
+      function exitSongFocus() {
+        activeSongIndex = null;
+        renderSongs();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function filterByArtist(artistName) {
+        activeSongIndex = null;
+        document.getElementById("searchInput").value = artistName;
+        renderSongs();
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
       function calculateEffectiveTranspose(song) {
-        // Der Kapo beeinflusst die angezeigte Tonart-Zahl nicht mehr.
-        // Es wird nur noch der manuelle transposeKey angezeigt.
-        return song.transposeKey || 0;
+        return (
+          (song.transposeKey || 0) +
+          ((song.originalCapo || 0) - (song.capo || 0))
+        );
       }
 
       function capoLabel(song) {
@@ -1209,7 +1364,7 @@ Ugly things that I think daily
           noneChip.className =
             "folder-chip" +
             (currentFolderFilter === "__none__" ? " active" : "");
-          noneChip.innerHTML = `📄 Ohne Ordner <span class="count">${unassignedCount}</span>`;
+          noneChip.innerHTML = `Ohne Ordner <span class="count">${unassignedCount}</span>`;
           noneChip.onclick = () => selectFolderFilter("__none__");
           bar.appendChild(noneChip);
         }
@@ -1224,8 +1379,8 @@ Ugly things that I think daily
             <span class="folder-dot"></span>
             ${escapeHtml(f.name)}
             <span class="count">${count}</span>
-            <span class="chip-btn edit-btn" title="Ordner bearbeiten">✏️</span>
-            <span class="chip-btn del-btn" title="Ordner löschen">✕</span>
+            <span class="chip-btn edit-btn" title="Ordner bearbeiten">[B]</span>
+            <span class="chip-btn del-btn" title="Ordner löschen">X</span>
           `;
 
           chip.querySelector(".edit-btn").onclick = (e) => {
@@ -1255,22 +1410,89 @@ Ugly things that I think daily
         ) {
           const activeFolder = getFolder(currentFolderFilter);
           if (activeFolder && activeFolder.description) {
-            infoText.textContent = `ℹ️ ${activeFolder.description}`;
+            infoText.textContent = `Info: ${activeFolder.description}`;
           }
         }
       }
 
       function renderSongs() {
         const container = document.getElementById("songs");
-        const toc = document.getElementById("toc");
+        const tocWrap = document.getElementById("tocWrapper");
+        const folderCard = document.getElementById("folderCardContainer");
+        const topOuterBar = document.querySelector(".top-outer-bar");
+        const addPanel = document.getElementById("addPanel");
         const query = (document.getElementById("searchInput").value || "")
           .trim()
           .toLowerCase();
 
         container.innerHTML = "";
-        toc.innerHTML = "";
         renderFolderBar();
-        updateQuickJumpSelect();
+
+        const datalist = document.getElementById("songSuggestions");
+        const artistDatalist = document.getElementById("artistSuggestions");
+
+        if (datalist) datalist.innerHTML = "";
+        if (artistDatalist) artistDatalist.innerHTML = "";
+
+        const uniqueArtists = [
+          ...new Set(songs.map((s) => s.artist).filter(Boolean)),
+        ];
+
+        songs.forEach((s) => {
+          if (datalist) {
+            const opt1 = document.createElement("option");
+            opt1.value = s.title;
+            datalist.appendChild(opt1);
+
+            if (s.artist) {
+              const opt2 = document.createElement("option");
+              opt2.value = s.artist;
+              datalist.appendChild(opt2);
+            }
+          }
+        });
+
+        uniqueArtists.forEach((artist) => {
+          if (artistDatalist) {
+            const opt = document.createElement("option");
+            opt.value = artist;
+            artistDatalist.appendChild(opt);
+          }
+        });
+
+        if (activeSongIndex !== null && songs[activeSongIndex]) {
+          if (tocWrap) tocWrap.style.display = "none";
+          if (folderCard) folderCard.style.display = "none";
+          if (topOuterBar) topOuterBar.style.display = "none";
+          if (addPanel) addPanel.classList.remove("open");
+
+          const backBar = document.createElement("div");
+          backBar.style.cssText = "margin-bottom: 10px;";
+          backBar.innerHTML = `<button class="btn-primary" onclick="exitSongFocus()">&larr; Zurück zur Übersicht</button>`;
+          container.appendChild(backBar);
+
+          const song = songs[activeSongIndex];
+          const div = document.createElement("div");
+          div.className = "song";
+          div.id = "song-" + activeSongIndex;
+          div.innerHTML = getSongHTML(song, activeSongIndex);
+          container.appendChild(div);
+
+          if (song.editing) {
+            const sel = document.getElementById(
+              `edit-folder-${activeSongIndex}`,
+            );
+            if (sel) populateFolderSelect(sel, song.folder || "");
+          }
+          return;
+        }
+
+        if (tocWrap) tocWrap.style.display = "block";
+        if (folderCard) folderCard.style.display = "block";
+        if (topOuterBar) topOuterBar.style.display = "flex";
+
+        const toc = document.getElementById("toc");
+        toc.innerHTML = "";
 
         const matches = (song) => {
           if (
@@ -1304,9 +1526,9 @@ Ugly things that I think daily
 
           const li = document.createElement("li");
           const artistStr = song.artist
-            ? `<span class="toc-artist">${escapeHtml(song.artist)}</span>`
+            ? `<span class="toc-artist" onclick="filterByArtist('${escapeHtml(song.artist).replace(/'/g, "\\'")}')">${escapeHtml(song.artist)}</span>`
             : "<span></span>";
-          li.innerHTML = `<a href="#song-${i}">${escapeHtml(song.title)}</a>${artistStr}`;
+          li.innerHTML = `<a onclick="focusSong(${i})">${escapeHtml(song.title)}</a>${artistStr}`;
           toc.appendChild(li);
         });
 
@@ -1324,40 +1546,44 @@ Ugly things that I think daily
         if (song.editing) return getEditHTML(song, index);
 
         const totalTranspose = calculateEffectiveTranspose(song);
-        const transLabel =
-          totalTranspose > 0 ? `+${totalTranspose}` : `${totalTranspose}`;
         const displayedHTML = processText(song.originalText, {
           transpose: totalTranspose,
           highlight: true,
         });
 
+        const manualTranspose = song.transposeKey || 0;
+        const transLabel =
+          manualTranspose > 0 ? `+${manualTranspose}` : `${manualTranspose}`;
+
         const folderObj = getFolder(song.folder);
         const folderColor = folderObj ? folderObj.color : "var(--string)";
 
+        const safeArtist = escapeHtml(song.artist || "").replace(/'/g, "\\'");
+
         return `
-        <h2>${escapeHtml(song.title)}</h2>
+        <h2 onclick="focusSong(${index})">${escapeHtml(song.title)}</h2>
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom: 12px;">
-            ${song.artist ? `<div class="artist">von ${escapeHtml(song.artist)}</div>` : ""}
-            ${song.folder ? `<span class="folder-badge" style="color:${folderColor}; background:${folderColor}18; border-color:${folderColor}40;">📁 ${escapeHtml(song.folder)}</span>` : ""}
-            ${song.bpm ? `<span class="bpm-badge">🥁 ${song.bpm} BPM</span>` : ""}
+            ${song.artist ? `<div class="artist" onclick="filterByArtist('${safeArtist}')">von ${escapeHtml(song.artist)}</div>` : ""}
+            ${song.folder ? `<span class="folder-badge" style="color:${folderColor}; background:${folderColor}18; border-color:${folderColor}40;">Ordner: ${escapeHtml(song.folder)}</span>` : ""}
+            ${song.bpm ? `<span class="bpm-badge">${song.bpm} BPM</span>` : ""}
         </div>
 
         <div class="song-actions">
-            <label>Tonart (+/−)</label>
-            <button onclick="transposeSong(${index}, -1)">−1</button>
+            <label>Tonart (+/-)</label>
+            <button onclick="transposeSong(${index}, -1)">-1</button>
             <span class="status">${transLabel}</span>
             <button onclick="transposeSong(${index}, 1)">+1</button>
 
-            <label style="margin-left:8px;">🎸 Kapo:</label>
+            <label style="margin-left:8px;">Kapo:</label>
             <div class="number-control">
-              <button onclick="stepCapo(${index}, -1)">−</button>
+              <button onclick="stepCapo(${index}, -1)">-</button>
               <input type="number" value="${song.capo || 0}" min="0" max="12" onchange="changeCapo(${index}, this.value)">
               <button onclick="stepCapo(${index}, 1)">+</button>
             </div>
             <span class="capo-info">${capoLabel(song)}</span>
 
             <div class="spacer"></div>
-            <button onclick="editSong(${index})">✏️ Bearbeiten</button>
+            <button onclick="editSong(${index})">Bearbeiten</button>
         </div>
 
         <pre id="pre-${index}">${displayedHTML}</pre>
@@ -1369,32 +1595,32 @@ Ugly things that I think daily
         <div class="edit-panel">
             <div class="row2">
                 <input type="text" id="edit-title-${index}" value="${escapeHtml(song.title)}" placeholder="Songtitel">
-                <input type="text" id="edit-artist-${index}" value="${escapeHtml(song.artist || "")}" placeholder="Künstler / Interpret">
+                <input type="text" id="edit-artist-${index}" value="${escapeHtml(song.artist || "")}" placeholder="Künstler / Interpret" list="artistSuggestions">
             </div>
             <textarea id="edit-text-${index}">${escapeHtml(song.originalText)}</textarea>
             <div class="capo-row">
-                <label>🎸 Original Kapo Bund:</label>
+                <label>Original Kapo Bund:</label>
                 <div class="number-control">
-                  <button type="button" onclick="stepNumber('edit-capo-${index}', -1)">−</button>
+                  <button type="button" onclick="stepNumber('edit-capo-${index}', -1)">-</button>
                   <input type="number" id="edit-capo-${index}" value="${song.originalCapo !== undefined ? song.originalCapo : song.capo || 0}" min="0" max="12">
                   <button type="button" onclick="stepNumber('edit-capo-${index}', 1)">+</button>
                 </div>
-                <label style="margin-left:15px;">🥁 BPM:</label>
+                <label style="margin-left:15px;">BPM:</label>
                 <div class="number-control">
-                  <button type="button" onclick="stepNumber('edit-bpm-${index}', -5)">−</button>
+                  <button type="button" onclick="stepNumber('edit-bpm-${index}', -5)">-</button>
                   <input type="number" id="edit-bpm-${index}" value="${song.bpm || 120}" min="30" max="300" style="width:54px;">
                   <button type="button" onclick="stepNumber('edit-bpm-${index}', 5)">+</button>
                 </div>
             </div>
             <div class="capo-row">
-                <label>📁 Ordner:</label>
+                <label>Ordner:</label>
                 <select id="edit-folder-${index}" onchange="handleFolderSelectChange(this)"></select>
             </div>
             <div class="edit-actions" style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
-                <button class="btn-danger" onclick="deleteSong(${index})">🗑️ Löschen</button>
+                <button class="btn-danger" onclick="deleteSong(${index})">Löschen</button>
                 <button onclick="cancelEdit(${index})">Abbrechen</button>
                 <div style="margin-left:auto;"></div>
-                <button class="btn-primary" onclick="saveEdit(${index})">💾 Speichern</button>
+                <button class="btn-primary" onclick="saveEdit(${index})">Speichern</button>
             </div>
         </div>
     `;
@@ -1441,10 +1667,17 @@ Ugly things that I think daily
         document.getElementById("artist").value = "";
         document.getElementById("input").value = "";
         document.getElementById("capo").value = "0";
+
+        toggleAddPanel();
       }
 
       function deleteSong(index) {
         if (confirm(`Möchtest du "${songs[index].title}" wirklich löschen?`)) {
+          if (activeSongIndex === index) {
+            activeSongIndex = null;
+          } else if (activeSongIndex > index) {
+            activeSongIndex--;
+          }
           songs.splice(index, 1);
           saveSongs();
           renderSongs();
@@ -1502,7 +1735,6 @@ Ugly things that I think daily
 
         if (folder === NEW_FOLDER_VALUE) folder = "";
 
-        // Falls sich das Original-Kapo geändert hat, passen wir den aktuellen Kapo-Wert an, sofern er noch auf dem alten Original stand
         const oldOrig =
           songs[index].originalCapo !== undefined
             ? songs[index].originalCapo
@@ -1566,9 +1798,9 @@ Ugly things that I think daily
 
       function toggleAddPanel() {
         const panel = document.getElementById("addPanel");
-        const arrow = document.getElementById("addPanelArrow");
+        const btn = document.getElementById("addSongToggleBtn");
         panel.classList.toggle("open");
-        arrow.textContent = panel.classList.contains("open") ? "▴" : "▾";
+        btn.classList.toggle("open", panel.classList.contains("open"));
       }
 
       function setFontSize(px) {
@@ -1580,10 +1812,10 @@ Ugly things that I think daily
         if (isScrolling) {
           isScrolling = false;
           if (scrollRAF) cancelAnimationFrame(scrollRAF);
-          button.innerText = "▶ Start";
+          button.innerText = "Start";
         } else {
           isScrolling = true;
-          button.innerText = "⏸ Stopp";
+          button.innerText = "Stopp";
           lastFrameTime = performance.now();
           scrollAccumulator = 0;
           scrollRAF = requestAnimationFrame(scrollStep);
@@ -1616,14 +1848,6 @@ Ugly things that I think daily
         scrollRAF = requestAnimationFrame(scrollStep);
       }
 
-      function updateProgressBar() {
-        const doc = document.documentElement;
-        const scrollable = doc.scrollHeight - doc.clientHeight;
-        const pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
-        document.getElementById("scrollProgress").style.width = pct + "%";
-      }
-      window.addEventListener("scroll", updateProgressBar);
-
       window.addEventListener("keydown", (e) => {
         if (
           ["INPUT", "TEXTAREA", "SELECT"].includes(
@@ -1649,9 +1873,9 @@ Ugly things that I think daily
         }
       });
 
+      initAccentColor();
       populateFolderSelect(document.getElementById("songFolder"), "");
       renderSongs();
-      updateProgressBar();
     </script>
   </body>
 </html>
