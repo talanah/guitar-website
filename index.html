@@ -1500,12 +1500,17 @@ Ugly things that I think daily
       }
 
       const TAB_LINE_RE =
-        /^[a-gA-G]\s*\|[-0-9hHpPbBsS\/\\~()xX.\s]*\|?\s*(?:[xX]\d+)?\s*$/;
-      const TAB_LINE_GENERIC_RE = /^[\|\-][-0-9hHpPbBsS\/\\~()xX.\s\|]*$/;
+        /^\s*[a-gA-G]\s*\|[-0-9hHpPbBsS\/\\~()xX.\s]*\|?\s*(?:[xX]\d+)?\s*$/;
+      const TAB_LINE_GENERIC_RE = /^\s*[\|\-][-0-9hHpPbBsS\/\\~()xX.\s\|]+$/;
 
       function isTabLine(line) {
         if (line === "") return false;
-        return TAB_LINE_RE.test(line) || TAB_LINE_GENERIC_RE.test(line);
+        const trimmed = line.trim();
+        return (
+          TAB_LINE_RE.test(line) ||
+          TAB_LINE_GENERIC_RE.test(line) ||
+          (trimmed.includes("|") && trimmed.includes("-"))
+        );
       }
 
       function processText(text, { transpose = 0, highlight = false } = {}) {
