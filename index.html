@@ -1695,37 +1695,35 @@ Ugly things that I think daily
       // Assigns finger 1 to the lowest fretted position(s), finger 2 to the
       // next-lowest, etc. If 2+ strings share the lowest fret, they are
       // rendered as a barre spanning those strings.
-      function autoFinger(frets) {
-        const fretted = frets
-          .map((f, i) => ({ i, f }))
-          .filter((o) => typeof o.f === "number" && o.f > 0);
-        const fingers = [0, 0, 0, 0, 0, 0];
-        if (fretted.length === 0) return { fingers, barre: null };
+function autoFinger(frets) {
+  const fretted = frets
+    .map((f, i) => ({ i, f }))
+    .filter(({ f }) => Number.isInteger(f) && f > 0);
 
-        const uniqueFrets = [...new Set(fretted.map((o) => o.f))].sort(
-          (a, b) => a - b,
-        );
-        uniqueFrets.forEach((fretVal, idx) => {
-          const finger = idx + 1;
-          fretted
-            .filter((o) => o.f === fretVal)
-            .forEach((o) => (fingers[o.i] = finger));
-        });
+  const fingers = [0, 0, 0, 0, 0, 0];
 
-        let barre = null;
-        const lowFret = uniqueFrets[0];
-        const lowIdxs = fretted
-          .filter((o) => o.f === lowFret)
-          .map((o) => o.i);
-        if (lowIdxs.length >= 2) {
-          barre = {
-            fret: lowFret,
-            from: Math.min(...lowIdxs),
-            to: Math.max(...lowIdxs),
-          };
-        }
-        return { fingers, barre };
-      }
+  if (!fretted.length) {
+    return { fingers, barre: null };
+  }
+
+  const uniqueFrets = [...new Set(fretted.map(({ f }) => f))].sort((a, b) => a - b);
+
+  uniqueFrets.forEach((fret, idx) => {
+    const finger = Math.min(idx + 1, 4);
+
+    fretted
+      .filter((o) => o.f === fret)
+      .forEach((o) => {
+        fingers[o.i] = finger;
+      });
+  });
+
+  // Kein automatischer Barré!
+  return {
+    fingers,
+    barre: null,
+  };
+}
 
       function buildCustomShape(frets) {
         const { fingers, barre } = autoFinger(frets);
