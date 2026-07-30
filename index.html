@@ -424,7 +424,7 @@
         font-style: italic;
       }
 
-.folder-badge,
+      .folder-badge,
       .bpm-badge,
       .tuning-badge {
         font-size: 12px;
@@ -443,7 +443,7 @@
         border: 1px solid var(--wood-glow);
       }
 
-.capo-info {
+      .capo-info {
         font-size: 12.5px;
         color: var(--wood);
         background: var(--wood-glow);
@@ -748,12 +748,16 @@
         gap: 6px;
       }
 
-      pre {
+      .song pre {
         font-family: var(--font-mono);
-        white-space: pre-wrap;
+        white-space: pre; /* Verhindert unkontrolliertes Umbrechen mitten im Tab */
+        overflow-x: auto; /* Erlaubt horizontales Scrollen, falls der Tab zu breit ist */
+        max-width: 100%;
+        display: block;
         font-size: var(--lyric-size, 16px);
         line-height: 1.65;
         margin: 0;
+        padding-bottom: 6px; /* Platz für die Scrollbar */
       }
 
       .controls-panel {
@@ -1190,6 +1194,7 @@ Ugly things that I think daily
         if (save) {
           localStorage.setItem(ACCENT_KEY, preset.main);
           renderAccentPicker(preset.main);
+          renderSongs(); // <-- Füge das hier hinzu, damit die Ansicht inkl. SVGs sofort neu gezeichnet wird!
         }
       }
 
@@ -1556,7 +1561,7 @@ Ugly things that I think daily
       const OPEN_SHAPES = {
         E_major: { frets: [0, 2, 2, 1, 0, 0], fingers: [0, 2, 3, 1, 0, 0] },
         E_minor: { frets: [0, 2, 2, 0, 0, 0], fingers: [0, 2, 3, 0, 0, 0] },
-        "E_7": { frets: [0, 2, 0, 1, 0, 0], fingers: [0, 2, 0, 1, 0, 0] },
+        E_7: { frets: [0, 2, 0, 1, 0, 0], fingers: [0, 2, 0, 1, 0, 0] },
         E_m7: { frets: [0, 2, 0, 0, 0, 0], fingers: [0, 2, 0, 0, 0, 0] },
         E_maj7: { frets: [0, 2, 1, 1, 0, 0], fingers: [0, 3, 1, 2, 0, 0] },
         A_major: {
@@ -1567,7 +1572,7 @@ Ugly things that I think daily
           frets: [null, 0, 2, 2, 1, 0],
           fingers: [0, 0, 2, 3, 1, 0],
         },
-        "A_7": { frets: [null, 0, 2, 0, 2, 0], fingers: [0, 0, 2, 0, 3, 0] },
+        A_7: { frets: [null, 0, 2, 0, 2, 0], fingers: [0, 0, 2, 0, 3, 0] },
         A_m7: { frets: [null, 0, 2, 0, 1, 0], fingers: [0, 0, 2, 0, 1, 0] },
         A_maj7: {
           frets: [null, 0, 2, 1, 2, 0],
@@ -1581,22 +1586,22 @@ Ugly things that I think daily
           frets: [null, null, 0, 2, 3, 1],
           fingers: [0, 0, 0, 2, 3, 1],
         },
-        "D_7": {
+        D_7: {
           frets: [null, null, 0, 2, 1, 2],
           fingers: [0, 0, 0, 2, 1, 3],
         },
         G_major: { frets: [3, 2, 0, 0, 0, 3], fingers: [2, 1, 0, 0, 0, 3] },
-        "G_7": { frets: [3, 2, 0, 0, 0, 1], fingers: [3, 2, 0, 0, 0, 1] },
+        G_7: { frets: [3, 2, 0, 0, 0, 1], fingers: [3, 2, 0, 0, 0, 1] },
         C_major: {
           frets: [null, 3, 2, 0, 1, 0],
           fingers: [0, 3, 2, 0, 1, 0],
         },
-        "C_7": { frets: [null, 3, 2, 3, 1, 0], fingers: [0, 3, 2, 4, 1, 0] },
+        C_7: { frets: [null, 3, 2, 3, 1, 0], fingers: [0, 3, 2, 4, 1, 0] },
         C_maj7: {
           frets: [null, 3, 2, 0, 0, 0],
           fingers: [0, 3, 2, 0, 0, 0],
         },
-        "B_7": { frets: [null, 2, 1, 2, 0, 2], fingers: [0, 2, 1, 3, 0, 4] },
+        B_7: { frets: [null, 2, 1, 2, 0, 2], fingers: [0, 2, 1, 3, 0, 4] },
         F_major: {
           frets: [1, 3, 3, 2, 1, 1],
           fingers: [1, 3, 4, 2, 1, 1],
@@ -1609,7 +1614,7 @@ Ugly things that I think daily
       const E_SHAPE = {
         major: { delta: [0, 2, 2, 1, 0, 0], fingers: [1, 3, 4, 2, 1, 1] },
         minor: { delta: [0, 2, 2, 0, 0, 0], fingers: [1, 3, 4, 1, 1, 1] },
-        "7": { delta: [0, 2, 0, 1, 0, 0], fingers: [1, 3, 1, 2, 1, 1] },
+        7: { delta: [0, 2, 0, 1, 0, 0], fingers: [1, 3, 1, 2, 1, 1] },
         m7: { delta: [0, 2, 0, 0, 0, 0], fingers: [1, 3, 1, 1, 1, 1] },
         maj7: { delta: [0, 2, 1, 1, 0, 0], fingers: [1, 4, 2, 3, 1, 1] },
         sus4: { delta: [0, 2, 2, 2, 0, 0], fingers: [1, 2, 3, 4, 1, 1] },
@@ -1626,7 +1631,7 @@ Ugly things that I think daily
           delta: [null, 0, 2, 2, 1, 0],
           fingers: [0, 1, 3, 4, 2, 1],
         },
-        "7": { delta: [null, 0, 2, 0, 2, 0], fingers: [0, 1, 3, 1, 4, 1] },
+        7: { delta: [null, 0, 2, 0, 2, 0], fingers: [0, 1, 3, 1, 4, 1] },
         m7: { delta: [null, 0, 2, 0, 1, 0], fingers: [0, 1, 3, 1, 2, 1] },
         maj7: {
           delta: [null, 0, 2, 1, 2, 0],
@@ -1663,7 +1668,9 @@ Ugly things that I think daily
         else if (/^sus2$/.test(raw)) quality = "sus2";
         else if (/^dim/.test(raw)) quality = "dim";
         else if (/^aug/.test(raw)) quality = "aug";
-        else quality = raw.includes("m") && !raw.includes("maj") ? "minor" : "major";
+        else
+          quality =
+            raw.includes("m") && !raw.includes("maj") ? "minor" : "major";
         return { root, quality };
       }
 
@@ -1695,35 +1702,37 @@ Ugly things that I think daily
       // Assigns finger 1 to the lowest fretted position(s), finger 2 to the
       // next-lowest, etc. If 2+ strings share the lowest fret, they are
       // rendered as a barre spanning those strings.
-function autoFinger(frets) {
-  const fretted = frets
-    .map((f, i) => ({ i, f }))
-    .filter(({ f }) => Number.isInteger(f) && f > 0);
+      function autoFinger(frets) {
+        const fretted = frets
+          .map((f, i) => ({ i, f }))
+          .filter(({ f }) => Number.isInteger(f) && f > 0);
 
-  const fingers = [0, 0, 0, 0, 0, 0];
+        const fingers = [0, 0, 0, 0, 0, 0];
 
-  if (!fretted.length) {
-    return { fingers, barre: null };
-  }
+        if (!fretted.length) {
+          return { fingers, barre: null };
+        }
 
-  const uniqueFrets = [...new Set(fretted.map(({ f }) => f))].sort((a, b) => a - b);
+        const uniqueFrets = [...new Set(fretted.map(({ f }) => f))].sort(
+          (a, b) => a - b,
+        );
 
-  uniqueFrets.forEach((fret, idx) => {
-    const finger = Math.min(idx + 1, 4);
+        uniqueFrets.forEach((fret, idx) => {
+          const finger = Math.min(idx + 1, 4);
 
-    fretted
-      .filter((o) => o.f === fret)
-      .forEach((o) => {
-        fingers[o.i] = finger;
-      });
-  });
+          fretted
+            .filter((o) => o.f === fret)
+            .forEach((o) => {
+              fingers[o.i] = finger;
+            });
+        });
 
-  // Kein automatischer Barré!
-  return {
-    fingers,
-    barre: null,
-  };
-}
+        // Kein automatischer Barré!
+        return {
+          fingers,
+          barre: null,
+        };
+      }
 
       function buildCustomShape(frets) {
         const { fingers, barre } = autoFinger(frets);
@@ -1841,7 +1850,9 @@ function autoFinger(frets) {
       function renderChordEditRow(song, index, name) {
         const safe = safeChordId(name);
         const shape = getEffectiveChordShape(name, song.chordOverrides);
-        const frets = shape ? shape.frets : [null, null, null, null, null, null];
+        const frets = shape
+          ? shape.frets
+          : [null, null, null, null, null, null];
         const nameJs = name.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
         const inputs = STRING_LABELS.map((label, i) => {
           const val = frets[i] === null ? "x" : frets[i];
@@ -1894,7 +1905,8 @@ function autoFinger(frets) {
           const el = document.getElementById(
             `chord-edit-fret-${index}-${safe}-${i}`,
           );
-          if (el) el.value = autoShape.frets[i] === null ? "x" : autoShape.frets[i];
+          if (el)
+            el.value = autoShape.frets[i] === null ? "x" : autoShape.frets[i];
         });
         updateChordPreview(index, name);
       }
