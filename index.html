@@ -1049,7 +1049,7 @@ Ugly things that I think daily
       <div class="folder-info-text" id="folderInfoText"></div>
     </div>
 
-    <div class="toc-wrap card" id="tocWrapper">
+<div class="toc-wrap card" id="tocWrapper">
       <h3>Inhaltsverzeichnis</h3>
       <div
         style="
@@ -2104,17 +2104,15 @@ Ugly things that I think daily
         }
       }
 
-      function renderSongs() {
+function renderSongs() {
         const container = document.getElementById("songs");
-        const tocWrap = document.getElementById("tocWrapper");
-        const folderCard = document.getElementById("folderCardContainer");
-        const topOuterBar = document.querySelector(".top-outer-bar");
-        const addPanel = document.getElementById("addPanel");
+        const toc = document.getElementById("toc");
         const query = (document.getElementById("searchInput").value || "")
           .trim()
           .toLowerCase();
 
         container.innerHTML = "";
+        toc.innerHTML = "";
         renderFolderBar();
 
         const datalist = document.getElementById("songSuggestions");
@@ -2141,9 +2139,34 @@ Ugly things that I think daily
           }
         });
 
-        const sortVal =
-          document.getElementById("songSortSelect")?.value || "title-asc";
-        filteredSongs.sort((a, b) => {
+        uniqueArtists.forEach((artist) => {
+          if (artistDatalist) {
+            const opt = document.createElement("option");
+            opt.value = artist;
+            artistDatalist.appendChild(opt);
+          }
+        });
+
+        // 1. Songs filtern nach Suche und Ordner
+        let filtered = songs.filter((song) => {
+          const matchQuery =
+            !query ||
+            song.title.toLowerCase().includes(query) ||
+            (song.artist && song.artist.toLowerCase().includes(query)) ||
+            (song.text && song.text.toLowerCase().includes(query));
+          const matchFolder =
+            currentFolderFilter === "__all__" ||
+            (currentFolderFilter === ""
+              ? !song.folder
+              : song.folder === currentFolderFilter);
+          return matchQuery && matchFolder;
+        });
+
+        // 2. Sortierung anwenden basierend auf dem Dropdown (#songSortSelect)
+        const sortSelect = document.getElementById("songSortSelect");
+        const sortVal = sortSelect ? sortSelect.value : "title-asc";
+
+        filtered.sort((a, b) => {
           const tA = (a.title || "").toLowerCase();
           const tB = (b.title || "").toLowerCase();
           const arA = (a.artist || "").toLowerCase();
@@ -2158,103 +2181,61 @@ Ugly things that I think daily
           return 0; // "default"
         });
 
-        uniqueArtists.forEach((artist) => {
-          if (artistDatalist) {
-            const opt = document.createElement("option");
-            opt.value = artist;
-            artistDatalist.appendChild(opt);
-          }
-        });
-
-        if (activeSongIndex !== null && songs[activeSongIndex]) {
-          if (tocWrap) tocWrap.style.display = "none";
-          if (folderCard) folderCard.style.display = "none";
-          if (topOuterBar) topOuterBar.style.display = "none";
-          if (addPanel) addPanel.classList.remove("open");
-
-          const backBar = document.createElement("div");
-          backBar.style.cssText = "margin-bottom: 10px;";
-          backBar.innerHTML = `<button class="btn-primary" onclick="exitSongFocus()">&larr; Zurück zur Übersicht</button>`;
-          container.appendChild(backBar);
-
-          const song = songs[activeSongIndex];
-          const div = document.createElement("div");
-          div.className = "song";
-          div.id = "song-" + activeSongIndex;
-          div.innerHTML = getSongHTML(song, activeSongIndex);
-          container.appendChild(div);
-
-          if (song.editing) {
-            const sel = document.getElementById(
-              `edit-folder-${activeSongIndex}`,
-            );
-            if (sel) populateFolderSelect(sel, song.folder || "");
-          }
+        if (filtered.length === 0) {
+          toc.innerHTML =
+            '<li style="color: var(--text-dim); padding: 8px 0;">Keine Songs gefunden</li>';
           return;
         }
 
-        if (tocWrap) tocWrap.style.display = "block";
-        if (folderCard) folderCard.style.display = "block";
-        if (topOuterBar) topOuterBar.style.display = "flex";
+        // 3. Gefilterte & sortierte Songs rendern
+        filtered.forEach((song, index) => {
+          const songId = `song-${index}`;
+          
+          // Inhaltsverzeichnis Eintrag
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.href = `#${songId}`;
+          a.textContent = song.title;
+          li.appendChild(a);
 
-        const toc = document.getElementById("toc");
-        toc.innerHTML = "";
+          if (song.artist) {
+            const spanArtist = document.createElement("span");
+            spanArtist.className = "toc-artist";
+            spanArtist.textContent = song.artist;
+            spanArtist.onclick = () => {
+              document.getElementById("searchInput").value = song.artist;
+              renderSongs();
+            };
+            li.appendChild(spanArtist);
+          }
+          toc.appendChild(li);
 
-        const matches = (song) => {
-          if (
-            query &&
-            !(
-              song.title.toLowerCase().includes(query) ||
-              (song.artist || "").toLowerCase().includes(query)
-            )
-          )
-            return false;
-          if (currentFolderFilter === "__all__") return true;
-          if (currentFolderFilter === "__none__") return !song.folder;
-          return song.folder === currentFolderFilter;
-        };
+          // Songkarte generieren
+          const card = document.createElement("div");
+          card.className = "song";
+          card.id = songId;
 
-        let visibleCount = 0;
-        songs.forEach((song, i) => {
-          if (!matches(song)) return;
-          visibleCount++;
+          const h2 = document.createElement("h2");
+          h2.textContent = song.title;
+          card.appendChild(h2);
 
-          const div = document.createElement("div");
-          div.className = "song";
-          div.id = "song-" + i;
-          div.innerHTML = getSongHTML(song, i);
-          container.appendChild(div);
-
-          if (song.editing) {
-            const sel = document.getElementById(`edit-folder-${i}`);
-            if (sel) populateFolderSelect(sel, song.folder || "");
+          if (song.artist) {
+            const divArtist = document.createElement("div");
+            divArtist.className = "artist";
+            divArtist.textContent = song.artist;
+            divArtist.onclick = () => {
+              document.getElementById("searchInput").value = song.artist;
+              renderSongs();
+            };
+            card.appendChild(divArtist);
           }
 
-          const li = document.createElement("li");
-          li.style.cursor = "pointer";
-          const artistStr = song.artist
-            ? `<span class="toc-artist" onclick="filterByArtist('${escapeHtml(song.artist).replace(/'/g, "\\'")}')">${escapeHtml(song.artist)}</span>`
-            : "<span></span>";
-          li.innerHTML = `<a onclick="focusSong(${i})">${escapeHtml(song.title)}</a>${artistStr}`;
-          li.addEventListener("click", (e) => {
-            if (
-              !e.target.classList.contains("toc-artist") &&
-              e.target.tagName !== "A"
-            ) {
-              scrollToSong(i);
-            }
-          });
-          toc.appendChild(li);
-        });
+          const pre = document.createElement("pre");
+          pre.innerHTML = processText(song.text || "", { transpose: 0 });
+          card.appendChild(pre);
 
-        if (visibleCount === 0) {
-          const li = document.createElement("li");
-          li.style.color = "var(--text-faint)";
-          li.textContent = query
-            ? "Keine Treffer."
-            : "Noch keine Songs in diesem Ordner.";
-          toc.appendChild(li);
-        }
+          container.appendChild(card);
+        });
       }
 
       function getSongHTML(song, index) {
