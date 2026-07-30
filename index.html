@@ -605,6 +605,10 @@
       .chords-panel.open {
         display: block;
         animation: chordsFadeIn 0.15s ease;
+        position: sticky;
+        top: 84px;
+        z-index: 90;
+        box-shadow: var(--shadow);
       }
       @keyframes chordsFadeIn {
         from {
@@ -680,6 +684,68 @@
         font-size: 18px;
         color: var(--wood);
         letter-spacing: -0.3px;
+      }
+
+      .chords-edit-section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .chords-edit-hint {
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      .chord-edit-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--surface-2);
+        flex-wrap: wrap;
+      }
+      .chord-edit-name {
+        font-family: var(--font-display);
+        font-weight: 800;
+        color: var(--wood);
+        min-width: 54px;
+        font-size: 16px;
+      }
+      .chord-edit-preview {
+        width: 68px;
+        flex: none;
+      }
+      .chord-edit-preview .chord-svg {
+        width: 68px;
+      }
+      .chord-edit-strings {
+        display: flex;
+        gap: 5px;
+      }
+      .chord-edit-strings .str-input {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+      }
+      .chord-edit-strings .str-input span {
+        font-size: 10px;
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+        font-weight: 600;
+      }
+      .chord-edit-strings input {
+        width: 28px;
+        padding: 5px 0;
+        text-align: center;
+        font-size: 12px;
+        font-family: var(--font-mono);
+      }
+      .chord-edit-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 6px;
       }
 
       pre {
@@ -1614,7 +1680,7 @@ Ugly things that I think daily
         return { frets, fingers, barre };
       }
 
-      function getChordShape(token) {
+      function getAutoChordShape(token) {
         const parsed = parseChordName(token);
         if (!parsed) return null;
         const rootIdx = noteToMap[parsed.root];
@@ -1623,6 +1689,74 @@ Ugly things that I think daily
         const key = `${rootSharp}_${parsed.quality}`;
         if (OPEN_SHAPES[key]) return { ...OPEN_SHAPES[key] };
         return buildBarreShape(rootIdx, parsed.quality);
+      }
+
+      // Generic auto-fingering for a custom (user-edited) fret array.
+      // Assigns finger 1 to the lowest fretted position(s), finger 2 to the
+      // next-lowest, etc. If 2+ strings share the lowest fret, they are
+      // rendered as a barre spanning those strings.
+      function autoFinger(frets) {
+        const fretted = frets
+          .map((f, i) => ({ i, f }))
+          .filter((o) => typeof o.f === "number" && o.f > 0);
+        const fingers = [0, 0, 0, 0, 0, 0];
+        if (fretted.length === 0) return { fingers, barre: null };
+
+        const uniqueFrets = [...new Set(fretted.map((o) => o.f))].sort(
+          (a, b) => a - b,
+        );
+        uniqueFrets.forEach((fretVal, idx) => {
+          const finger = idx + 1;
+          fretted
+            .filter((o) => o.f === fretVal)
+            .forEach((o) => (fingers[o.i] = finger));
+        });
+
+        let barre = null;
+        const lowFret = uniqueFrets[0];
+        const lowIdxs = fretted
+          .filter((o) => o.f === lowFret)
+          .map((o) => o.i);
+        if (lowIdxs.length >= 2) {
+          barre = {
+            fret: lowFret,
+            from: Math.min(...lowIdxs),
+            to: Math.max(...lowIdxs),
+          };
+        }
+        return { fingers, barre };
+      }
+
+      function buildCustomShape(frets) {
+        const { fingers, barre } = autoFinger(frets);
+        return { frets, fingers, barre };
+      }
+
+      // Returns the shape that should actually be displayed for a chord:
+      // a user-defined override if one exists for this song, otherwise the
+      // automatic/database shape.
+      function getEffectiveChordShape(token, overrides) {
+        if (overrides && overrides[token]) {
+          return buildCustomShape(overrides[token]);
+        }
+        return getAutoChordShape(token);
+      }
+
+      function fretsEqual(a, b) {
+        if (!a || !b || a.length !== b.length) return false;
+        return a.every((v, i) => v === b[i]);
+      }
+
+      function parseFretInput(raw) {
+        const v = (raw || "").trim().toLowerCase();
+        if (v === "" || v === "x") return null;
+        const n = parseInt(v, 10);
+        if (isNaN(n)) return null;
+        return Math.max(0, Math.min(24, n));
+      }
+
+      function safeChordId(name) {
+        return name.replace(/[^a-zA-Z0-9]/g, "_");
       }
 
       function renderChordSVG(shape) {
@@ -1699,9 +1833,95 @@ Ugly things that I think daily
         return svg;
       }
 
-      function renderChordCard(name) {
-        const shape = getChordShape(name);
+      function renderChordCard(name, overrides) {
+        const shape = getEffectiveChordShape(name, overrides);
         return `<div class="chord-card">${renderChordSVG(shape)}<div class="chord-name">${escapeHtml(name)}</div></div>`;
+      }
+
+      const STRING_LABELS = ["E", "A", "D", "G", "B", "e"];
+
+      function renderChordEditRow(song, index, name) {
+        const safe = safeChordId(name);
+        const shape = getEffectiveChordShape(name, song.chordOverrides);
+        const frets = shape ? shape.frets : [null, null, null, null, null, null];
+        const nameJs = name.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+        const inputs = STRING_LABELS.map((label, i) => {
+          const val = frets[i] === null ? "x" : frets[i];
+          return `<div class="str-input">
+              <span>${label}</span>
+              <input type="text" maxlength="3"
+                id="chord-edit-fret-${index}-${safe}-${i}"
+                value="${val}"
+                oninput="updateChordPreview(${index}, '${nameJs}')">
+            </div>`;
+        }).join("");
+
+        return `
+        <div class="chord-edit-row" data-chord="${escapeHtml(name)}">
+            <div class="chord-edit-name">${escapeHtml(name)}</div>
+            <div class="chord-edit-preview" id="chord-edit-preview-${index}-${safe}">${renderChordSVG(shape)}</div>
+            <div class="chord-edit-strings">${inputs}</div>
+            <div class="chord-edit-actions">
+                <button type="button" class="btn-ghost" onclick="resetChordOverride(${index}, '${nameJs}')">Zurücksetzen</button>
+            </div>
+        </div>`;
+      }
+
+      function readChordFretsFromInputs(index, name) {
+        const safe = safeChordId(name);
+        return STRING_LABELS.map((_, i) => {
+          const el = document.getElementById(
+            `chord-edit-fret-${index}-${safe}-${i}`,
+          );
+          return el ? parseFretInput(el.value) : null;
+        });
+      }
+
+      function updateChordPreview(index, name) {
+        const safe = safeChordId(name);
+        const frets = readChordFretsFromInputs(index, name);
+        const shape = buildCustomShape(frets);
+        const preview = document.getElementById(
+          `chord-edit-preview-${index}-${safe}`,
+        );
+        if (preview) preview.innerHTML = renderChordSVG(shape);
+      }
+
+      function resetChordOverride(index, name) {
+        const safe = safeChordId(name);
+        const autoShape = getAutoChordShape(name) || {
+          frets: [null, null, null, null, null, null],
+        };
+        STRING_LABELS.forEach((_, i) => {
+          const el = document.getElementById(
+            `chord-edit-fret-${index}-${safe}-${i}`,
+          );
+          if (el) el.value = autoShape.frets[i] === null ? "x" : autoShape.frets[i];
+        });
+        updateChordPreview(index, name);
+      }
+
+      // Reads all chord-edit-rows currently in the DOM for this song and
+      // builds the chordOverrides object to persist (only chords whose
+      // fingering was actually changed from the automatic default).
+      function collectChordOverrides(index) {
+        const songDiv = document.getElementById(`song-${index}`);
+        if (!songDiv) return {};
+        const rows = songDiv.querySelectorAll(".chord-edit-row");
+        const overrides = {};
+        rows.forEach((row) => {
+          const name = row.getAttribute("data-chord");
+          if (!name) return;
+          const frets = readChordFretsFromInputs(index, name);
+          const autoShape = getAutoChordShape(name);
+          const autoFrets = autoShape
+            ? autoShape.frets
+            : [null, null, null, null, null, null];
+          if (!fretsEqual(frets, autoFrets)) {
+            overrides[name] = frets;
+          }
+        });
+        return overrides;
       }
 
       function extractChords(song) {
@@ -2006,7 +2226,7 @@ Ugly things that I think daily
           : "";
         const chordsPanelHTML = chordList.length
           ? `<div class="chords-panel${chordsOpen ? " open" : ""}" id="chords-${index}">
-               <div class="chords-grid">${chordList.map((c) => renderChordCard(c)).join("")}</div>
+               <div class="chords-grid">${chordList.map((c) => renderChordCard(c, song.chordOverrides)).join("")}</div>
              </div>`
           : "";
 
@@ -2046,6 +2266,15 @@ Ugly things that I think daily
       }
 
       function getEditHTML(song, index) {
+        const chordList = extractChords(song);
+        const chordsEditHTML = chordList.length
+          ? `<div class="chords-edit-section">
+               <label>Akkord-Griffe bearbeiten:</label>
+               <div class="chords-edit-hint">Bund-Nummer je Saite (tief E &rarr; hoch e), "x" = nicht gespielt, "0" = leer. Vorschau aktualisiert sich live.</div>
+               ${chordList.map((c) => renderChordEditRow(song, index, c)).join("")}
+             </div>`
+          : `<div class="chords-edit-hint">Keine Akkorde im Text gefunden.</div>`;
+
         return `
         <div class="edit-panel">
             <div class="row2">
@@ -2073,6 +2302,9 @@ Ugly things that I think daily
                 <label>Ordner:</label>
                 <select id="edit-folder-${index}" onchange="handleFolderSelectChange(this)"></select>
             </div>
+
+            ${chordsEditHTML}
+
             <div class="edit-actions" style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
                 <button class="btn-danger" onclick="deleteSong(${index})">Löschen</button>
                 <button onclick="cancelEdit(${index})">Abbrechen</button>
@@ -2219,6 +2451,8 @@ Ugly things that I think daily
           songs[index].capo = capo;
         }
 
+        const chordOverrides = collectChordOverrides(index);
+
         songs[index] = {
           ...songs[index],
           title,
@@ -2229,6 +2463,7 @@ Ugly things that I think daily
           bpm,
           tuning,
           folder,
+          chordOverrides,
           editing: false,
         };
         saveSongs();
