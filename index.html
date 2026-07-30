@@ -1052,7 +1052,13 @@ Ugly things that I think daily
     <div class="toc-wrap card" id="tocWrapper">
       <h3>Inhaltsverzeichnis</h3>
       <div
-        style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap"
+        style="
+          display: flex;
+          gap: 8px;
+          margin-bottom: 12px;
+          flex-wrap: wrap;
+          align-items: center;
+        "
       >
         <button class="btn-ghost" onclick="exportSongs()">Exportieren</button>
         <button
@@ -1068,6 +1074,26 @@ Ugly things that I think daily
           style="display: none"
           onchange="importSongs(this.files[0])"
         />
+
+        <select
+          id="songSortSelect"
+          onchange="renderSongs()"
+          style="
+            margin-left: auto;
+            background: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-family: inherit;
+          "
+        >
+          <option value="title-asc">Titel (A–Z)</option>
+          <option value="title-desc">Titel (Z–A)</option>
+          <option value="artist-asc">Interpret (A–Z)</option>
+          <option value="artist-desc">Interpret (Z–A)</option>
+          <option value="default">Standard</option>
+        </select>
       </div>
       <ul id="toc"></ul>
     </div>
@@ -2113,6 +2139,23 @@ Ugly things that I think daily
               datalist.appendChild(opt2);
             }
           }
+        });
+
+        const sortVal =
+          document.getElementById("songSortSelect")?.value || "title-asc";
+        filteredSongs.sort((a, b) => {
+          const tA = (a.title || "").toLowerCase();
+          const tB = (b.title || "").toLowerCase();
+          const arA = (a.artist || "").toLowerCase();
+          const arB = (b.artist || "").toLowerCase();
+
+          if (sortVal === "title-asc") return tA.localeCompare(tB);
+          if (sortVal === "title-desc") return tB.localeCompare(tA);
+          if (sortVal === "artist-asc")
+            return arA.localeCompare(arB) || tA.localeCompare(tB);
+          if (sortVal === "artist-desc")
+            return arB.localeCompare(arA) || tA.localeCompare(tB);
+          return 0; // "default"
         });
 
         uniqueArtists.forEach((artist) => {
