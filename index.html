@@ -2187,7 +2187,7 @@ function renderSongs() {
           return;
         }
 
-        // 3. Gefilterte & sortierte Songs rendern
+        // 3. Gefilterte & sortierte Songs rendern (Inhaltsverzeichnis + Songkarten mit Akkorden)
         filtered.forEach((song, index) => {
           const songId = `song-${index}`;
           
@@ -2210,7 +2210,7 @@ function renderSongs() {
           }
           toc.appendChild(li);
 
-          // Songkarte generieren
+          // Songkarte mit Text und Akkorden generieren
           const card = document.createElement("div");
           card.className = "song";
           card.id = songId;
@@ -2237,7 +2237,6 @@ function renderSongs() {
           container.appendChild(card);
         });
       }
-
       function getSongHTML(song, index) {
         if (song.editing) return getEditHTML(song, index);
 
