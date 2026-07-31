@@ -1472,8 +1472,13 @@ Ugly things that I think daily
         B: 11,
       };
       const CHORD_TOKEN_RE =
-        /^[A-G][#b]?(?:maj|min|dim|sus|add|aug|m)?[0-9]*(?:\/[A-G][#b]?)?$/;
+        /^[A-G][#b]?(?:maj|min|dim|sus|add|aug|m)?[0-9]*(?:b5|-5|#5)?(?:\/[A-G][#b]?)?$/;
       const REPEAT_TOKEN_RE = /^[xX]\d+$/;
+      // "No chord" markers, e.g. "N.C.", "N.C", "NC" - common notation for a
+      // silent/unpitched beat. These should count as valid tokens on a chord
+      // line (so the rest of the line, e.g. real chords like Cadd9, still get
+      // recognized), but they don't get a chord diagram of their own.
+      const NC_TOKEN_RE = /^N\.?C\.?$/i;
 
       function transposeNote(root, amount) {
         if (!(root in noteToMap)) return root;
@@ -1496,7 +1501,12 @@ Ugly things that I think daily
         if (line === "") return false;
         return line
           .split(/\s+/)
-          .every((t) => CHORD_TOKEN_RE.test(t) || REPEAT_TOKEN_RE.test(t));
+          .every(
+            (t) =>
+              CHORD_TOKEN_RE.test(t) ||
+              REPEAT_TOKEN_RE.test(t) ||
+              NC_TOKEN_RE.test(t),
+          );
       }
 
       const TAB_LINE_RE =
@@ -1595,6 +1605,11 @@ Ugly things that I think daily
           frets: [null, null, 0, 2, 1, 2],
           fingers: [0, 0, 0, 2, 1, 3],
         },
+        D_m7b5: {
+          frets: [null, null, 0, 1, 1, 1],
+          fingers: [0, 0, 0, 1, 1, 1],
+          barre: { fret: 1, from: 3, to: 5 },
+        },
         G_major: { frets: [3, 2, 0, 0, 0, 3], fingers: [2, 1, 0, 0, 0, 3] },
         G_7: { frets: [3, 2, 0, 0, 0, 1], fingers: [3, 2, 0, 0, 0, 1] },
         C_major: {
@@ -1612,6 +1627,18 @@ Ugly things that I think daily
           fingers: [1, 3, 4, 2, 1, 1],
           barre: { fret: 1, from: 0, to: 5 },
         },
+        C_add9: {
+          frets: [null, 3, 2, 0, 3, 0],
+          fingers: [0, 3, 1, 0, 4, 0],
+        },
+        D_add9: {
+          frets: [null, null, 0, 2, 3, 0],
+          fingers: [0, 0, 0, 1, 2, 0],
+        },
+        G_add9: {
+          frets: [3, null, 0, 2, 0, 0],
+          fingers: [3, 0, 0, 4, 0, 0],
+        },
       };
 
       // E-shape (root on low E string) / A-shape (root on A string) movable
@@ -1626,6 +1653,15 @@ Ugly things that I think daily
         sus2: { delta: [0, 2, 2, 2, 0, 0], fingers: [1, 2, 3, 4, 1, 1] },
         dim: { delta: [0, 2, 2, 0, 0, 0], fingers: [1, 3, 4, 1, 1, 1] },
         aug: { delta: [0, 2, 2, 1, 0, 0], fingers: [1, 3, 4, 2, 1, 1] },
+        // Half-diminished (m7b5): root, b5 (A string), root-fret unison
+        // (D string), m3 (G string), B string muted, root octave (e string).
+        // Not a clean single-finger barre (B string sits out), so this is
+        // rendered as individual dots rather than a barre rectangle.
+        m7b5: {
+          delta: [0, 1, 0, 0, null, 0],
+          fingers: [1, 2, 1, 1, 0, 1],
+          noBarre: true,
+        },
       };
       const A_SHAPE = {
         major: {
@@ -1655,6 +1691,13 @@ Ugly things that I think daily
           delta: [null, 0, 2, 2, 2, 0],
           fingers: [0, 1, 2, 3, 4, 1],
         },
+        // Half-diminished (m7b5): root (A string), b5 (D string), b7
+        // (G string, root-fret unison), m3 (B string), low E + high e muted.
+        m7b5: {
+          delta: [null, 0, 1, 0, 1, null],
+          fingers: [0, 1, 2, 1, 3, 0],
+          noBarre: true,
+        },
       };
 
       function parseChordName(token) {
@@ -1671,6 +1714,8 @@ Ugly things that I think daily
         else if (/^7$/.test(raw)) quality = "7";
         else if (/^(sus4|sus)$/.test(raw)) quality = "sus4";
         else if (/^sus2$/.test(raw)) quality = "sus2";
+        else if (/^add9$/.test(raw)) quality = "add9";
+        else if (/^(m7b5|m7-5|min7b5|min7-5)$/.test(raw)) quality = "m7b5";
         else if (/^dim/.test(raw)) quality = "dim";
         else if (/^aug/.test(raw)) quality = "aug";
         else
@@ -1688,7 +1733,10 @@ Ugly things that I think daily
         const tmpl = table[quality] || table.major;
         const frets = tmpl.delta.map((d) => (d === null ? null : d + b));
         const fingers = tmpl.fingers.slice();
-        const barre = b >= 1 ? { fret: b, from: useE ? 0 : 1, to: 5 } : null;
+        const barre =
+          b >= 1 && !tmpl.noBarre
+            ? { fret: b, from: useE ? 0 : 1, to: 5 }
+            : null;
         return { frets, fingers, barre };
       }
 
@@ -1825,7 +1873,7 @@ Ugly things that I think daily
           const y = top + row * rowH + rowH / 2;
           const x1 = stringX[barre.from] - 9,
             x2 = stringX[barre.to] + 9;
-          svg += `<rect class="barre" x="${x1}" y="${y - 8}" width="${x2 - x1}" height="16" rx="8"/>`;
+          svg += `<rect class="barre" x="${x1}" y="${y - 5.5}" width="${x2 - x1}" height="11" rx="5.5"/>`;
         }
 
         frets.forEach((f, i) => {
@@ -1947,7 +1995,8 @@ Ugly things that I think daily
           const trimmed = line.trim();
           if (!isChordLine(trimmed)) return;
           trimmed.split(/\s+/).forEach((tok) => {
-            if (!tok || REPEAT_TOKEN_RE.test(tok)) return;
+            if (!tok || REPEAT_TOKEN_RE.test(tok) || NC_TOKEN_RE.test(tok))
+              return;
             const t = changeChord(tok, transpose);
             if (!seen.has(t)) {
               seen.add(t);
