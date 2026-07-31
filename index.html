@@ -1753,8 +1753,11 @@ Ugly things that I think daily
 
       // Generic auto-fingering for a custom (user-edited) fret array.
       // Assigns finger 1 to the lowest fretted position(s), finger 2 to the
-      // next-lowest, etc. If 2+ strings share the lowest fret, they are
-      // rendered as a barre spanning those strings.
+      // next-lowest, etc. If the lowest fret occurs on 2+ strings, and every
+      // string between the outermost of those occurrences is itself fretted
+      // (not open, not muted), it's rendered as a barre spanning that range -
+      // a flat finger physically can't lie across an open or muted string in
+      // the middle, so those cases are deliberately NOT treated as a barre.
       function autoFinger(frets) {
         const fretted = frets
           .map((f, i) => ({ i, f }))
@@ -1780,11 +1783,25 @@ Ugly things that I think daily
             });
         });
 
-        // Kein automatischer Barré!
-        return {
-          fingers,
-          barre: null,
-        };
+        const minFret = uniqueFrets[0];
+        const minIndices = fretted
+          .filter((o) => o.f === minFret)
+          .map((o) => o.i);
+
+        let barre = null;
+        if (minIndices.length >= 2) {
+          const from = Math.min(...minIndices);
+          const to = Math.max(...minIndices);
+          const spanIsPlayable = Array.from(
+            { length: to - from + 1 },
+            (_, k) => from + k,
+          ).every((i) => typeof frets[i] === "number" && frets[i] > 0);
+          if (spanIsPlayable) {
+            barre = { fret: minFret, from, to };
+          }
+        }
+
+        return { fingers, barre };
       }
 
       function buildCustomShape(frets) {
