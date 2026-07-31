@@ -1472,7 +1472,7 @@ Ugly things that I think daily
         B: 11,
       };
       const CHORD_TOKEN_RE =
-        /^[A-G][#b]?(?:maj|min|dim|sus|add|aug|m)?[0-9]*(?:b5|-5|#5)?(?:\/[A-G][#b]?)?$/;
+        /^[A-G][#b]?(?:maj|min|dim|aug|m)?[0-9]*(?:sus4|sus2|sus|add9|b5|-5|#5)?[0-9]*(?:\/[A-G][#b]?)?$/;
       const REPEAT_TOKEN_RE = /^[xX]\d+$/;
       // "No chord" markers, e.g. "N.C.", "N.C", "NC" - common notation for a
       // silent/unpitched beat. These should count as valid tokens on a chord
@@ -1610,6 +1610,14 @@ Ugly things that I think daily
           fingers: [0, 0, 0, 1, 1, 1],
           barre: { fret: 1, from: 3, to: 5 },
         },
+        D_sus4: {
+          frets: [null, null, 0, 2, 3, 3],
+          fingers: [0, 0, 0, 1, 2, 3],
+        },
+        A_7sus4: {
+          frets: [null, 0, 2, 0, 3, 0],
+          fingers: [0, 0, 2, 0, 3, 0],
+        },
         G_major: { frets: [3, 2, 0, 0, 0, 3], fingers: [2, 1, 0, 0, 0, 3] },
         G_7: { frets: [3, 2, 0, 0, 0, 1], fingers: [3, 2, 0, 0, 0, 1] },
         C_major: {
@@ -1662,6 +1670,13 @@ Ugly things that I think daily
           fingers: [1, 2, 1, 1, 0, 1],
           noBarre: true,
         },
+        // 7sus4: root, 4th, b7, 5th all at the same fret - a full barre
+        // with the G string muted/deadened (a real, commonly used technique).
+        "7sus4": {
+          delta: [0, 0, 0, null, 0, 0],
+          fingers: [1, 1, 1, 0, 1, 1],
+          noBarre: true,
+        },
       };
       const A_SHAPE = {
         major: {
@@ -1698,6 +1713,13 @@ Ugly things that I think daily
           fingers: [0, 1, 2, 1, 3, 0],
           noBarre: true,
         },
+        // 7sus4: root (A string), 4th (D string), b7 (G string) all at the
+        // same fret, 5th on the open/root-fret high e string, B string muted.
+        "7sus4": {
+          delta: [null, 0, 0, 0, null, 0],
+          fingers: [0, 1, 1, 1, 0, 1],
+          noBarre: true,
+        },
       };
 
       function parseChordName(token) {
@@ -1714,6 +1736,7 @@ Ugly things that I think daily
         else if (/^7$/.test(raw)) quality = "7";
         else if (/^(sus4|sus)$/.test(raw)) quality = "sus4";
         else if (/^sus2$/.test(raw)) quality = "sus2";
+        else if (/^(7sus4|7sus)$/.test(raw)) quality = "7sus4";
         else if (/^add9$/.test(raw)) quality = "add9";
         else if (/^(m7b5|m7-5|min7b5|min7-5)$/.test(raw)) quality = "m7b5";
         else if (/^dim/.test(raw)) quality = "dim";
