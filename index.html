@@ -2238,10 +2238,33 @@ Ugly things that I think daily
         };
 
         let visibleCount = 0;
+        const tocEntries = [];
         songs.forEach((song, i) => {
           if (!matches(song)) return;
           visibleCount++;
+          tocEntries.push({ song, i });
+        });
 
+        // Sort both the song cards and the table-of-contents by artist name
+        // (case-/umlaut-insensitive), then by title as a tiebreaker. Songs
+        // without an artist sort last. This only affects display order -
+        // ids and onclick handlers still reference each song's original
+        // array index, so editing/focusing/scrolling keep working.
+        tocEntries.sort((a, b) => {
+          const artistA = (a.song.artist || "").trim();
+          const artistB = (b.song.artist || "").trim();
+          if (!artistA && artistB) return 1;
+          if (artistA && !artistB) return -1;
+          const artistCompare = artistA.localeCompare(artistB, "de", {
+            sensitivity: "base",
+          });
+          if (artistCompare !== 0) return artistCompare;
+          return (a.song.title || "").localeCompare(b.song.title || "", "de", {
+            sensitivity: "base",
+          });
+        });
+
+        tocEntries.forEach(({ song, i }) => {
           const div = document.createElement("div");
           div.className = "song";
           div.id = "song-" + i;
