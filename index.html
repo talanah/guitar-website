@@ -1406,19 +1406,39 @@ Ugly things that I think daily
 
       // Returns the normalized/display tuning string (e.g. "Standard (EADGBE)"),
       // or null if the input isn't a valid 6-note tuning.
-      function normalizeTuning(raw) {
-        const trimmed = (raw || "").trim();
-        if (!trimmed) return "Standard (EADGBE)";
+function normalizeTuning(raw) {
+  const trimmed = (raw || "").trim();
+  if (!trimmed) return "Standard (EADGBE)";
 
-        const parenMatch = trimmed.match(/\(([^)]+)\)\s*$/);
-        const notesPart = parenMatch ? parenMatch[1] : trimmed;
-        const cleaned = notesPart.replace(/[\s\-]/g, "").toUpperCase();
+  const parenMatch = trimmed.match(/\(([^)]+)\)\s*$/);
+  const notesPart = parenMatch ? parenMatch[1] : trimmed;
+  const cleaned = notesPart.replace(/[\s\-]/g, "");
 
-        if (!/^([A-G]#?){6}$/.test(cleaned)) return null;
+  // In bis zu 6 Töne zerlegen: Buchstabe A-G (beliebige Schreibweise),
+  // optional gefolgt von einem Vorzeichen: '#' (Kreuz) oder 'b' (Bemolle).
+  const tokens = cleaned.match(/[A-Ga-g](?:#|b)?/g);
+  if (!tokens || tokens.length !== 6 || tokens.join("").length !== cleaned.length) {
+    return null;
+  }
 
-        const preset = TUNING_PRESETS.find((p) => p.notes === cleaned);
-        return preset ? `${preset.name} (${preset.notes})` : cleaned;
-      }
+  // Notenname groß, Vorzeichen unverändert übernehmen
+  const normalized = tokens.map((t) => {
+    const letter = t[0].toUpperCase();
+    const accidental = t.length > 1 ? t[1].toLowerCase() : "";
+    return letter + accidental;
+  });
+
+  // Nur echte Noten zulassen (z. B. "Hb" abfangen)
+  if (!normalized.every((n) => n in noteToMap)) return null;
+
+  // Für den Preset-Vergleich (Presets sind mit # gespeichert) in Kreuz-Schreibweise umwandeln
+  const sharpForm = normalized.map((n) => scaleSharp[noteToMap[n]]).join("");
+
+  const preset = TUNING_PRESETS.find((p) => p.notes === sharpForm);
+  if (preset) return `${preset.name} (${preset.notes})`;
+
+  return normalized.join("");
+}
 
       function isValidTuningInput(raw) {
         return normalizeTuning(raw) !== null;
