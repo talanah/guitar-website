@@ -2166,20 +2166,22 @@ Ugly things that I think daily
         const uniqueArtists = [
           ...new Set(songs.map((s) => s.artist).filter(Boolean)),
         ];
+        const uniqueTitles = [
+          ...new Set(songs.map((s) => s.title).filter(Boolean)),
+        ];
 
-        songs.forEach((s) => {
-          if (datalist) {
+        if (datalist) {
+          uniqueTitles.forEach((title) => {
             const opt1 = document.createElement("option");
-            opt1.value = s.title;
+            opt1.value = title;
             datalist.appendChild(opt1);
-
-            if (s.artist) {
-              const opt2 = document.createElement("option");
-              opt2.value = s.artist;
-              datalist.appendChild(opt2);
-            }
-          }
-        });
+          });
+          uniqueArtists.forEach((artist) => {
+            const opt2 = document.createElement("option");
+            opt2.value = artist;
+            datalist.appendChild(opt2);
+          });
+        }
 
         uniqueArtists.forEach((artist) => {
           if (artistDatalist) {
