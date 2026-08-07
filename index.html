@@ -306,8 +306,8 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 34px;
-        height: 34px;
+        width: 30px;
+        height: 30px;
         padding: 0;
         border-radius: 50%;
         background: #1db954;
@@ -326,8 +326,8 @@
         transform: scale(0.96);
       }
       .btn-spotify svg {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         flex: none;
         fill: currentColor;
       }
@@ -1033,7 +1033,7 @@ G                  D
 Ugly things that I think daily
       </textarea>
       <div class="capo-row">
-        <label>Original-Kapo Bund:</label>
+        <label>Original-Kapo:</label>
         <div class="number-control">
           <button type="button" onclick="stepNumber('capo', -1)">-</button>
           <input id="capo" type="number" value="0" min="0" max="12" />
@@ -2387,7 +2387,7 @@ function normalizeTuning(raw) {
              </div>`
           : "";
 
-        const spotifyBtnHTML = `<a class="btn-spotify" href="${spotifySearchUrl(song)}" target="_blank" rel="noopener" title="Auf Spotify suchen">
+        const spotifyBtnHTML = `<a class="btn-spotify" href="${spotifySearchUrl(song)}" title="In Spotify App suchen">
             <svg viewBox="0 0 168 168" xmlns="http://www.w3.org/2000/svg">
               <path d="M83.996.277C37.747.277.253 37.77.253 84.019c0 46.251 37.494 83.741 83.743 83.741 46.254 0 83.744-37.49 83.744-83.741 0-46.246-37.49-83.738-83.744-83.738l.001-.004zm38.404 120.78a5.217 5.217 0 01-7.18 1.73c-19.662-12.01-44.414-14.73-73.564-8.07a5.222 5.222 0 01-6.249-3.93 5.213 5.213 0 013.926-6.25c31.9-7.291 59.263-4.15 81.337 9.34a5.215 5.215 0 011.73 7.18zm10.25-22.805c-1.999 3.245-6.25 4.273-9.495 2.273-22.505-13.834-56.822-17.84-83.448-9.764-3.65 1.105-7.505-.956-8.613-4.606-1.105-3.65.955-7.503 4.61-8.614 30.412-9.228 68.222-4.758 94.081 11.214 3.246 2 4.274 6.25 2.273 9.497zm.88-23.744c-26.995-16.03-71.52-17.505-97.289-9.684-4.374 1.325-9-1.155-10.326-5.526-1.325-4.375 1.155-9 5.53-10.325 29.585-8.98 78.775-7.245 109.83 11.202 3.938 2.334 5.238 7.418 2.906 11.355-2.334 3.938-7.421 5.238-11.354 2.905l.001-.001z"/>
             </svg>
@@ -2417,9 +2417,9 @@ function normalizeTuning(raw) {
             <span class="capo-info">${capoLabel(song)}</span>
 
             ${chordsButtonHTML}
+            ${spotifyBtnHTML}
 
             <div class="spacer"></div>
-            ${spotifyBtnHTML}
             <button onclick="editSong(${index})">Bearbeiten</button>
         </div>
 
